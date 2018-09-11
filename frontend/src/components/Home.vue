@@ -19,6 +19,7 @@
       </v-layout>
     </v-container>
     <template v-if="!analysisDone">
+      <p>Analysiere Link...</p>
       <v-progress-circular
         indeterminate
         color="primary"
@@ -32,6 +33,7 @@
       <p>{{analysisOutput}}</p>
     </template>
     <template v-if="!scrapingDone">
+      <p>Aktualisiere Datenbank...</p>
       <v-progress-circular
         indeterminate
         color="primary"
