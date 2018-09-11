@@ -390,6 +390,7 @@ def do_create_twitter(train, test):
 def pack_data_to_predict(predict_file, wordvec_model_article, wordvec_model_tweet):
     df = utils.get_df(predict_file)
     # preprocessing
+    print(df)
     print('removing stop words')
     nlp = spacy.load('de')
     stop_words = get_stop_words('de')

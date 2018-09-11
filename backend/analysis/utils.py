@@ -87,10 +87,11 @@ def get_df(predict_file):
         #   print(key + ": " + str(value))
         #    print('\n')
         df = pd.DataFrame(dict([ (k, pd.Series(v)) for k, v in predict_file.items() ]))
-        df = df.dropna()
+        print(df)
+        #df = df.dropna()
         #for index, row in df.iterrows():
         #    print(row['c1'], row['c2'])
-        #print(df)
+        print(df)
     else:
         df = pd.read_csv(predict_file, sep='|')
     return df

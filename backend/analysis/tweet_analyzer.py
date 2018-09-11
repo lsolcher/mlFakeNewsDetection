@@ -2,18 +2,15 @@ import tweepy
 from bs4 import BeautifulSoup
 import string
 import re
-import os
-from http.client import IncompleteRead
 from urllib.request import urlopen, HTTPError, Request
 from urllib3.exceptions import ProtocolError
-import csv
 import requests
 import pandas as pd
 from langdetect import detect, lang_detect_exception
 import traceback
 import datetime
-
 from . import constants
+
 
 ckey = 'rGxOFKgKRoGo1Kpl1FEqjNGlI'
 csecret = 'nnk4mqbRdOQQsCy8rIwCAxHnFUO6iGgjkpSsM96bGSZcANg7mR'
@@ -51,6 +48,25 @@ def get_tweet_by_url(tweet_url):
         return False, 'The entered tweet id does not exist.'
 
 
+def get_article_url(url, idx):
+    resp = urlopen(url)
+    soup = BeautifulSoup(resp, 'html.parser', from_encoding=resp.info().get_param('charset'))
+    counter = 0
+    idx += 1  # because the first link is the tweet itself
+    for link in soup.find_all('a', href=True):
+        if '/t.co/' in link['href']:
+            print(link['href'])
+            if counter == idx:
+                r = requests.get(link['href'])
+                url = r.url
+                return url
+            else:
+                counter += 1
+    return None
+
+
+
+
 def process_tweet(status):
     print('STATUS:')
     print(status)
@@ -77,91 +93,97 @@ def process_tweet(status):
                 print(tweet)
                 print(urls)
                 print('------------')
-                for url_input in urls:
+                for idx, url_input in enumerate(urls):
                     r = requests.get(url_input)
                     url = r.url  # twitter is redircecting - get the correct link
-                    all_text, all_hidden_text, article = is_article(url, check_for_duplicates=False)
+                    if 'twitter.com/i/' in url:
+                        url = get_article_url(url, idx)
+                    if url is not None:
+                        all_text, all_hidden_text, article = is_article(url, check_for_duplicates=False)
 
-                    #  format text to not mess up csv writing
-                    all_text = all_text.replace('|', ';')  # we use | as csv delimiter so replace them
-                    all_hidden_text = all_hidden_text.replace('|', ';')
-                    all_hidden_text = all_hidden_text.replace('\n', ' ')
-                    all_text = all_text.replace('\n', ' ')
-                    tweet = tweet.replace('\n', ' ')
-                    all_hidden_text = all_hidden_text.replace('\r', ' ')
-                    all_hidden_text = all_hidden_text.replace('\t', ' ')
-                    all_hidden_text = all_hidden_text.replace('  ', ' ')
-                    all_text = all_text.replace('\r', ' ')
-                    tweet = tweet.replace('\r', ' ')
-                    all_text = all_text.rstrip()
-                    all_hidden_text = all_hidden_text.rstrip()
-                    tweet = tweet.replace('|', ';')
+                        #  format text to not mess up csv writing
+                        all_text = all_text.replace('|', ';')  # we use | as csv delimiter so replace them
+                        all_hidden_text = all_hidden_text.replace('|', ';')
+                        all_hidden_text = all_hidden_text.replace('\n', ' ')
+                        all_text = all_text.replace('\n', ' ')
+                        tweet = tweet.replace('\n', ' ')
+                        all_hidden_text = all_hidden_text.replace('\r', ' ')
+                        all_hidden_text = all_hidden_text.replace('\t', ' ')
+                        all_hidden_text = all_hidden_text.replace('  ', ' ')
+                        all_text = all_text.replace('\r', ' ')
+                        tweet = tweet.replace('\r', ' ')
+                        all_text = all_text.rstrip()
+                        all_hidden_text = all_hidden_text.rstrip()
+                        tweet = tweet.replace('|', ';')
 
-                    print('{}: Found Tweet with links'.format(datetime.datetime.now().time()))
-                    if article:
-                        tweet_url = 'https://twitter.com/i/web/status/' + str(status.id)  # twitter url to retireve ids
-                        if hasattr(status, 'retweeted_status'):  # tweet is retweet
-                            print('Tweet is retweet, getting original tweet')
-                            fields = {}
-                            fields['tweet_url'] = tweet_url
-                            fields['article_url'] = url
-                            fields['article_text'] = all_text
-                            fields['tweet_id'] = status.retweeted_status.id_str
-                            fields['user_id'] = status.retweeted_status.author.id_str
-                            fields['user_str'] = status.retweeted_status.author.screen_name
-                            fields['account_created'] = status.retweeted_status.author.created_at
-                            fields['total_number_tweets'] = status.retweeted_status.author.statuses_count
-                            fields['followers_count'] = status.retweeted_status.author.followers_count
-                            fields['friends_count'] = status.retweeted_status.author.friends_count
-                            fields['favourites_count'] = status.retweeted_status.author.favourites_count
-                            fields['verified'] = status.retweeted_status.author.verified
-                            fields['retweet_count'] = status.retweeted_status.retweet_count
-                            fields['number_hashtags'] = len(status.retweeted_status.entities.get('hashtags'))
-                            fields['hashtags'] = status.retweeted_status.entities.get('hashtags')
-                            fields['number_urls'] =  len(status.retweeted_status.entities.get('urls'))
-                            fields['urls_str'] = status.retweeted_status.entities.get('urls')
-                            fields['tweet_text'] = tweet
-                            fields['timestamp'] = status.retweeted_status.created_at
-                            fields['number_quotes'] =  status.retweeted_status.quote_count
-                            fields['number_replies'] = status.retweeted_status.reply_count
-                            fields['number_retweets'] = status.retweeted_status.retweet_count
-                            fields['skipped_text'] = all_hidden_text
-                        else:  # tweet is original tweet
-                            print('Tweet is original tweet')
-                            fields = {}
-                            fields['tweet_url'] = tweet_url
-                            fields['article_url'] = url
-                            fields['article_text'] = all_text
-                            fields['tweet_id'] = status.id_str
-                            fields['user_id'] = status.author.id_str
-                            fields['user_str'] = status.author.screen_name
-                            fields['account_created'] = status.author.created_at
-                            fields['total_number_tweets'] = status.author.statuses_count
-                            fields['followers_count'] = status.author.followers_count
-                            fields['friends_count'] = status.author.friends_count
-                            fields['favourites_count'] = status.author.favourites_count
-                            fields['verified'] = status.author.verified
-                            fields['retweet_count'] = status.retweet_count
-                            fields['number_hashtags'] =  len(status.entities.get('hashtags'))
-                            fields['hashtags'] = status.entities.get('hashtags')
-                            fields['number_urls'] = len(status.entities.get('urls'))
-                            fields['urls_str'] = status.entities.get('urls')
-                            fields['tweet_text'] = tweet
-                            fields['timestamp'] = status.created_at
-                            fields['number_quotes'] = 0
-                            fields['number_replies'] = 0
-                            fields['number_retweets'] = 0
-                            fields['skipped_text'] = all_hidden_text
-                        return True, fields
-                        # try:
-                        #     with open(constants.TWITTER_DATA_FILE, 'a', encoding='utf-8', newline='') as f:
-                        #         writer = csv.writer(f, delimiter='|')
-                        #         writer.writerow(fields)
-                        #     print('Wrote linked article(s) from {}'.format(url))
-                        # except:
-                        #     print('Resultfile open, Couldn\'t write article from {}'.format(url))
+                        print('{}: Found Tweet with links'.format(datetime.datetime.now().time()))
+                        if article:
+                            tweet_url = 'https://twitter.com/i/web/status/' + str(status.id)  # twitter url to retireve ids
+                            if hasattr(status, 'retweeted_status'):  # tweet is retweet
+                                print('Tweet is retweet, getting original tweet')
+                                fields = {}
+                                fields['tweet_url'] = tweet_url
+                                fields['article_url'] = url
+                                fields['article_text'] = all_text
+                                fields['tweet_id'] = status.retweeted_status.id_str
+                                fields['user_id'] = status.retweeted_status.author.id_str
+                                fields['user_str'] = status.retweeted_status.author.screen_name
+                                fields['account_created'] = status.retweeted_status.author.created_at
+                                fields['total_number_tweets'] = status.retweeted_status.author.statuses_count
+                                fields['followers_count'] = status.retweeted_status.author.followers_count
+                                fields['friends_count'] = status.retweeted_status.author.friends_count
+                                fields['favourites_count'] = status.retweeted_status.author.favourites_count
+                                fields['verified'] = status.retweeted_status.author.verified
+                                fields['retweet_count'] = status.retweeted_status.retweet_count
+                                fields['number_hashtags'] = len(status.retweeted_status.entities.get('hashtags'))
+                                fields['hashtags'] = status.retweeted_status.entities.get('hashtags')
+                                fields['number_urls'] =  len(status.retweeted_status.entities.get('urls'))
+                                fields['urls_str'] = status.retweeted_status.entities.get('urls')
+                                fields['tweet_text'] = tweet
+                                fields['timestamp'] = status.retweeted_status.created_at
+                                #TODO
+                                fields['number_quotes'] = 0# status.retweeted_status.quote_count
+                                fields['number_replies'] = 0# status.retweeted_status.reply_count
+                                fields['number_retweets'] = 0# status.retweeted_status.retweet_count
+                                fields['skipped_text'] = all_hidden_text
+                            else:  # tweet is original tweet
+                                print('Tweet is original tweet')
+                                fields = {}
+                                fields['tweet_url'] = tweet_url
+                                fields['article_url'] = url
+                                fields['article_text'] = all_text
+                                fields['tweet_id'] = status.id_str
+                                fields['user_id'] = status.author.id_str
+                                fields['user_str'] = status.author.screen_name
+                                fields['account_created'] = status.author.created_at
+                                fields['total_number_tweets'] = status.author.statuses_count
+                                fields['followers_count'] = status.author.followers_count
+                                fields['friends_count'] = status.author.friends_count
+                                fields['favourites_count'] = status.author.favourites_count
+                                fields['verified'] = status.author.verified
+                                fields['retweet_count'] = status.retweet_count
+                                fields['number_hashtags'] =  len(status.entities.get('hashtags'))
+                                fields['hashtags'] = status.entities.get('hashtags')
+                                fields['number_urls'] = len(status.entities.get('urls'))
+                                fields['urls_str'] = status.entities.get('urls')
+                                fields['tweet_text'] = tweet
+                                fields['timestamp'] = status.created_at
+                                fields['number_quotes'] = 0
+                                fields['number_replies'] = 0
+                                fields['number_retweets'] = 0
+                                fields['skipped_text'] = all_hidden_text
+                            return True, fields
+                            # try:
+                            #     with open(constants.TWITTER_DATA_FILE, 'a', encoding='utf-8', newline='') as f:
+                            #         writer = csv.writer(f, delimiter='|')
+                            #         writer.writerow(fields)
+                            #     print('Wrote linked article(s) from {}'.format(url))
+                            # except:
+                            #     print('Resultfile open, Couldn\'t write article from {}'.format(url))
+                        else:
+                            return False, '{} verlinkt auf keinen Artikel'.format(url)
                     else:
-                        return False, '{} verlinkt auf keinen Artikel'.format(url)
+                        return False, 'Konnte keine Artikel in {} finden.'.format(url)
             except Exception as e1:
                 print('Unexpected Exception')
                 print(traceback.format_exc())
@@ -361,4 +383,3 @@ def xstr(s):
         return ''
     else:
         return str(s)
-

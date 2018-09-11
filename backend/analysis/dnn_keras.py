@@ -6,6 +6,7 @@ from keras.models import Sequential, Model, load_model
 from keras.layers import Dense, Dropout, Input, LSTM, Bidirectional, Flatten
 from keras.layers import Conv1D, MaxPooling1D, GlobalMaxPooling1D
 from keras.optimizers import SGD
+from keras import backend
 from sklearn.preprocessing import StandardScaler
 import seaborn as sns
 from sklearn.metrics import log_loss
@@ -41,11 +42,11 @@ def build_model(architecture='mlp'):
         #                activity_regularizer=regularizers.l1(0.01)))
         # Densely Connected Neural Network (Multi-Layer Perceptron)
         model.add(Dense(512, activation='relu', kernel_initializer='he_normal', input_dim=X_SHAPE))
-        #model.add(Dropout(0.2))
-        #model.add(Dense(512, activation='relu', kernel_initializer='he_normal'))
-        #model.add(Dropout(0.2))
+        model.add(Dropout(0.2))
+        model.add(Dense(512, activation='relu', kernel_initializer='he_normal'))
+        model.add(Dropout(0.2))
         model.add(Dense(256, activation='relu', kernel_initializer='he_normal'))
-        #model.add(Dropout(0.2))
+        model.add(Dropout(0.2))
         model.add(Dense(128, activation='relu', kernel_initializer='he_normal'))
         model.add(Dropout(0.2))
         model.add(Dense(OUTPUT_LABELS, activation='softmax'))
@@ -79,11 +80,13 @@ def build_model(architecture='mlp'):
 
 def analyze_tweet(tweet):
     w2v_article = utils.load_obj(constants.ARTICLE_TEXT_MODEL_FOLDER, 'word2vec_model')
+    print(w2v_article)
     w2v_tweet = utils.load_obj(constants.TWEET_TEXT_MODEL_FOLDER, 'word2vec_model')
+    print(w2v_tweet)
+    print(tweet)
     MODELNAME = 'sequential_1'
     if os.path.exists(os.path.join(MODEL_FOLDER, MODELNAME)):
         model = load_model(os.path.join(MODEL_FOLDER, MODELNAME))
-        print(model)
         predict(model, tweet, w2v_article, w2v_tweet)
 
 
@@ -103,14 +106,14 @@ def run(articles, articles_test, twitter_data, text_analysis=True, all_features=
                     TWITTER_DATA_FILE, type_of_analysis='tweet_text')
                 X_meta = create_meta_data_from_twitter(TWITTER_DATA_FILE)
                 train_cleaned_vec = np.concatenate([train_cleaned_vec_article, train_cleaned_vec_tweet, X_meta], axis=1)#
-                #TODO : scale together big and small ones
                 y_train_ohe = y_train_ohe_article
 
-                # TODO: add meta data
-                scaled_features = StandardScaler().fit_transform(train_cleaned_vec)
+                scaler = StandardScaler()
+                scaler.fit(train_cleaned_vec)
+                scaled_features = scaler.transform(train_cleaned_vec)
                 print(scaled_features)
 
-                X_train, X_test, y_train, y_test, idx1, idx2 = train_test_split(scaled_features, y_train_ohe, df['tweet_url'], test_size=0.5)
+                X_train, X_test, y_train, y_test, idx1, idx2 = train_test_split(scaled_features, y_train_ohe, df['tweet_url'], test_size=0.4)
             else:
                 if text_analysis:
                     X_train, X_test, y_train, y_test, w2v, train_cleaned_vec, y_train_ohe = create_word_vecs_from_twitter(TWITTER_DATA_FILE, type_of_analysis=TYPE_OF_ANALYSIS)
@@ -125,6 +128,7 @@ def run(articles, articles_test, twitter_data, text_analysis=True, all_features=
         MODELNAME = 'sequential_1'
 
         if os.path.exists(os.path.join(MODEL_FOLDER, MODELNAME)):
+
             model = load_model(os.path.join(MODEL_FOLDER, MODELNAME))
             predict(model, TEST_DATA_FILE, w2v_article, w2v_tweet)
     else:
@@ -134,9 +138,12 @@ def run(articles, articles_test, twitter_data, text_analysis=True, all_features=
 def predict(model, predict_file, w2v_article, w2v_tweet):
     print('predicting')
     X_test = pack_data_to_predict(predict_file, w2v_article, w2v_tweet)
+    print(X_test)
     X_meta = create_meta_data_from_twitter(predict_file)
     x_predict = np.concatenate([X_test, X_meta], axis=1)
-    scaled_features = StandardScaler().fit_transform(x_predict)
+    print(x_predict)
+    scaler = utils.load_obj(constants.OBJECT_FOLDER, 'scaler')
+    scaled_features = scaler.transform(x_predict)
     if model.name == "CNN" or model.name == "LSTM":
         scaled_features = np.expand_dims(scaled_features, axis=2)
 
@@ -151,9 +158,10 @@ def predict(model, predict_file, w2v_article, w2v_tweet):
             file_obj.write(
                 str(predict_urls[pred]) + '|' + '|'.join('{:.2f}'.format(s) for s in predicted_prob[pred].tolist()) + '\n')
     print('saved result file to {}'.format('predict.csv'))
-    # Report log loss and score
-    #loss_sk = log_loss(y_test, predicted_prob)
-    #print('Log loss is: {}'.format(loss_sk))
+    # clean up after prediction
+    del model
+    backend.clear_session()
+
 
 
 def get_class_weights(y_ohe):

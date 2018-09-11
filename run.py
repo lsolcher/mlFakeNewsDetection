@@ -4,12 +4,12 @@ from flask_cors import CORS
 from backend.analysis import main
 import requests
 
-DEBUG = True
 
 app = Flask(__name__,
             static_folder = "./dist/static",
             template_folder = "./dist")
 # cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+app.debug = False
 CORS(app)
 
 @app.route('/')
