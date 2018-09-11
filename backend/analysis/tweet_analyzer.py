@@ -9,8 +9,7 @@ import pandas as pd
 from langdetect import detect, lang_detect_exception
 import traceback
 import datetime
-from . import constants
-
+from backend import constants
 
 ckey = 'rGxOFKgKRoGo1Kpl1FEqjNGlI'
 csecret = 'nnk4mqbRdOQQsCy8rIwCAxHnFUO6iGgjkpSsM96bGSZcANg7mR'

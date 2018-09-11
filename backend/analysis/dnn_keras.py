@@ -13,11 +13,11 @@ from sklearn.metrics import log_loss
 import os
 from sklearn.model_selection import train_test_split
 import pandas as pd
-from . import utils, constants
+from . import utils
+from backend import constants
 from collections import Counter
 
 CURRENTFOLDER = constants.CURRENTFOLDER
-TOPFOLDER = constants.TOPFOLDER
 DATAFOLDER = constants.DATAFOLDER
 TWITTER_DATA_FILE = constants.TWITTER_DATA_FILE
 TEST_DATA_FILE = constants.TEST_DATA_FILE
@@ -111,7 +111,7 @@ def run(articles, articles_test, twitter_data, text_analysis=True, all_features=
                 X_train_tweet, X_test_tweet, y_train_tweet, y_test_tweet, w2v_tweet, train_cleaned_vec_tweet, y_train_ohe_tweet = create_word_vecs_from_twitter(
                     TWITTER_DATA_FILE, type_of_analysis='tweet_text')
                 X_meta = create_meta_data_from_twitter(TWITTER_DATA_FILE)
-                train_cleaned_vec = np.concatenate([train_cleaned_vec_article, train_cleaned_vec_tweet, X_meta], axis=1)#
+                train_cleaned_vec = np.concatenate([trcain_cleaned_vec_article, train_cleaned_vec_tweet, X_meta], axis=1)#
                 y_train_ohe = y_train_ohe_article
 
                 scaler = StandardScaler()

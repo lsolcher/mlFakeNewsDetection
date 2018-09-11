@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request
-from random import *
 from flask_cors import CORS
-from backend.analysis import main
+from backend.analysis import analyzer
+from backend.scraping import scraper
 import requests
 
 
@@ -20,11 +20,21 @@ def index():
 @app.route('/api/analyze')
 def analyze():
     user_input = request.args.get('input')
-    result = main.analyze_input(user_input)
+    result = analyzer.analyze_input(user_input)
     response = {
         'result': result
     }
     return jsonify(response)
+
+
+@app.route('/api/scrape')
+def scrape():
+    result = scraper.scrape()
+    response = {
+        'result': result
+    }
+    return jsonify(response)
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

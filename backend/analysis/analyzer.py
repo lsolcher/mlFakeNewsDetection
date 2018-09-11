@@ -1,4 +1,4 @@
-from . import dnn_keras, utils, constants, tweet_analyzer
+from . import dnn_keras, utils, tweet_analyzer
 
 
 def analyze_input(input_str):

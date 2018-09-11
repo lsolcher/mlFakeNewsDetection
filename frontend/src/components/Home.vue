@@ -11,14 +11,14 @@
             label="Artikel-link, Tweet-link oder Tweet-id einfügen..."
             placeholder="https://twitter.com/i/web/status/1038073678058139648"
             id="userinput"
-            @keyup.enter="getResult()"
+            @keyup.enter="getAnalysisResult()"
             v-model="input"
           ></v-text-field>
         </v-flex>
         <br>
       </v-layout>
     </v-container>
-    <template v-if="!done">
+    <template v-if="!analysisDone">
       <v-progress-circular
         indeterminate
         color="primary"
@@ -26,11 +26,24 @@
     </template>
     <template v-else>
       <v-btn
-        @click="getResult()"
+        @click="getAnalysisResult()"
         :disabled="input === ''"
       >Analysieren</v-btn>
-      <p>{{output}}</p>
+      <p>{{analysisOutput}}</p>
     </template>
+    <template v-if="!scrapingDone">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      ></v-progress-circular>
+    </template>
+    <template v-else>
+      <v-btn
+        @click="scrape()"
+      >Artikeldatenbank aktualisieren</v-btn>
+      <p>{{scrapingOutput}}</p>
+    </template>
+
 
   </div>
 </template>
@@ -43,17 +56,23 @@
       return {
         randomNumber: 0,
         input: '',
-        output: '',
-        done: true
+        analysisOutput: '',
+        scrapingOutput: '',
+        analysisDone: true,
+        scrapingDone: true
       }
     },
     methods: {
-      getResult() {
-        this.done = false
-        console.log(this.input)
-        this.output = this.getResultFromBackend()
+      scrape() {
+        this.scrapingDone = false;
+        this.scrapingOutput = this.getScrapingResultFromBackend()
       },
-      getResultFromBackend() {
+      getAnalysisResult() {
+        this.analysisDone = false;
+        console.log(this.input);
+        this.analysisOutput = this.getAnalysisResultFromBackend()
+      },
+      getAnalysisResultFromBackend() {
         const path = 'http://localhost:5000/api/analyze'
         axios.get(path, {
           params: {
@@ -61,19 +80,33 @@
           }
         })
           .then(response => {
-            this.output = response.data.result;
-            console.log(this.output)
-            this.done = true
+            this.analysisOutput = response.data.result;
+            console.log(this.analysisOutput);
+            this.analysisDone = true
           })
           .catch(error => {
-            console.log(error)
-            this.done = true
+            console.log(error);
+            this.analysisDone = true
+          })
+      },
+      getScrapingResultFromBackend() {
+        const path = 'http://localhost:5000/api/scrape';
+        axios.get(path)
+          .then(response => {
+            this.scrapingOutput = response.data.result;
+            console.log(this.scrapingOutput);
+            this.scrapingDone = true
+          })
+          .catch(error => {
+            console.log(error);
+            this.scrapingDone = true
           })
       }
     },
     created() {
       // this.getRandom();
-      this.getResult()
+      this.getAnalysisResult();
+      this.scrape()
     }
   }
 </script>
