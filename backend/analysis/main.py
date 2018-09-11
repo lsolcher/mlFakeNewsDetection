@@ -2,23 +2,28 @@ from . import dnn_keras, utils, constants, tweet_analyzer
 
 
 def analyze_input(input_str):
-    print(input_str)
-    if input_str.isdigit():
+
+    if input_str.isdigit():  # tweet-id
         success, result = tweet_analyzer.get_tweet_by_id(input_str)
         if success:
-            dnn_keras.analyze_tweet(result)
-            # return result
+            result = dnn_keras.analyze_tweet(result)
+            return utils.jsonify(result)
         else:
             # error string
             return result
     else:
         success, result = tweet_analyzer.get_tweet_by_url(input_str)
-        if success:
-            dnn_keras.analyze_tweet(result)
-            # return result
+        if success:  # tweet-url
+            result = dnn_keras.analyze_tweet(result)
+            return utils.jsonify(result)
         else:
-            # error string
-            return result
+            success, result = tweet_analyzer.process_article(input_str)
+            if success:
+                result = dnn_keras.analyze_article(input_str, result)
+                return utils.jsonify(result)
+            else:
+                # error string
+                return result
 
 """
 def run():

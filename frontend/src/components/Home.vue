@@ -18,9 +18,20 @@
         <br>
       </v-layout>
     </v-container>
+    <template v-if="!done">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      ></v-progress-circular>
+    </template>
+    <template v-else>
+      <v-btn
+        @click="getResult()"
+        :disabled="input === ''"
+      >Analysieren</v-btn>
+      <p>{{output}}</p>
+    </template>
 
-    <v-btn @click="getResult()">Analysieren</v-btn>
-    <p>Ergebnis: {{output}}</p>
   </div>
 </template>
 
@@ -32,11 +43,13 @@
       return {
         randomNumber: 0,
         input: '',
-        output: ''
+        output: '',
+        done: true
       }
     },
     methods: {
       getResult() {
+        this.done = false
         console.log(this.input)
         this.output = this.getResultFromBackend()
       },
@@ -50,9 +63,11 @@
           .then(response => {
             this.output = response.data.result;
             console.log(this.output)
+            this.done = true
           })
           .catch(error => {
             console.log(error)
+            this.done = true
           })
       }
     },

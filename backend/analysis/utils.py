@@ -81,17 +81,16 @@ def remove_duplicates(df):
     print('total size after removing duplicates: {}'.format(len(df.index)))
     return df
 
-def get_df(predict_file):
-    if type(predict_file) is dict:
-        #for key, value in predict_file.items():
-        #   print(key + ": " + str(value))
-        #    print('\n')
-        df = pd.DataFrame(dict([ (k, pd.Series(v)) for k, v in predict_file.items() ]))
-        print(df)
-        #df = df.dropna()
-        #for index, row in df.iterrows():
-        #    print(row['c1'], row['c2'])
-        print(df)
+def get_df(predict_input):
+    print(type(predict_input))
+    if type(predict_input) is dict:
+        df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in predict_input.items()]))
+    elif type(predict_input) is str:
+        #data = {'article_url' : [predict_input]}
+        df = pd.DataFrame(data=predict_input)
     else:
-        df = pd.read_csv(predict_file, sep='|')
+        df = pd.read_csv(predict_input, sep='|')
     return df
+
+def jsonify(ndarray):
+    return ndarray.tolist()

@@ -387,7 +387,7 @@ def do_create_twitter(train, test):
 
 
 
-def pack_data_to_predict(predict_file, wordvec_model_article, wordvec_model_tweet):
+def pack_data_to_predict(predict_file, wordvec_model_article, wordvec_model_tweet=None):
     df = utils.get_df(predict_file)
     # preprocessing
     print(df)
@@ -413,19 +413,18 @@ def pack_data_to_predict(predict_file, wordvec_model_article, wordvec_model_twee
     predict_cleaned_vec = np.zeros((df.shape[0], text_dim), dtype="float32")
     for i in range(len(predict_cleaned_article)):
         predict_cleaned_vec[i] = create_average_vec(predict_cleaned_article[i], wordvec_model_article)
+    if wordvec_model_tweet is not None:
+        # Create word vectors tweet
+        predict_cleaned_tweet = get_spacy_corpus(df['tweet_text'], nlp, logging=True)
+        print('Cleaned up training data shape: ', predict_cleaned_tweet.shape)
+        predict_cleaned_vec_tweet = np.zeros((df.shape[0], text_dim), dtype="float32")
+        for i in range(len(predict_cleaned_tweet)):
+            predict_cleaned_vec_tweet[i] = create_average_vec(predict_cleaned_tweet[i], wordvec_model_tweet)
 
 
-    predict_cleaned_tweet = get_spacy_corpus(df['tweet_text'], nlp, logging=True)
-    print('Cleaned up training data shape: ', predict_cleaned_tweet.shape)
-
-    text_dim = 300
-
-    # Create word vectors
-    predict_cleaned_vec_tweet = np.zeros((df.shape[0], text_dim), dtype="float32")
-    for i in range(len(predict_cleaned_tweet)):
-        predict_cleaned_vec_tweet[i] = create_average_vec(predict_cleaned_tweet[i], wordvec_model_tweet)
-    #TODO: meta data
-    return np.concatenate([predict_cleaned_vec, predict_cleaned_vec_tweet], axis=1)
+        return np.concatenate([predict_cleaned_vec, predict_cleaned_vec_tweet], axis=1)
+    else:
+        return predict_cleaned_vec
 
 
     """
