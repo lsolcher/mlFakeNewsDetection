@@ -1,4 +1,5 @@
 from . import SponScraper, SzScraper, JungeFreiheitScraper
+import traceback
 
 
 def scrape():
@@ -17,4 +18,5 @@ def scrape():
         SponScraper.scrape()
         return True
     except:
+        traceback.print_exc()
         return False

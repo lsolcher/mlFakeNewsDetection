@@ -12,6 +12,7 @@ import csv
 import os.path
 import traceback
 from backend import constants
+from pathlib import Path
 
 RESULTPATH = constants.ARTICLE_FOLDER
 
@@ -53,16 +54,26 @@ def scrape():
             except Exception:
                 traceback.print_exc()
 
-    article_links = list(set(article_links))  # eliminate duplicate entries
+    result_url_file = RESULTPATH + '\\jf_urls.txt'
+    Path(result_url_file).touch(exist_ok=True)
+    old_links = set(line.strip() for line in open(result_url_file))
+    article_links = set(article_links)  # eliminate duplicate entries
+    new_links = article_links - old_links # get only new - not already saved urls
+    print('Found {} new items since last scan'.format(len(new_links)))
+    with open(result_url_file, 'a') as f:
+        for item in new_links:
+            f.write("%s\n" % item)
+
+
     print('Found {} unique articles in total. Start writing...'.format(len(article_links)))
     # get article text and save it to file
     print(len(article_links))
-    for idx, article in enumerate(article_links):
+    for idx, url in enumerate(article_links):
         try:
             if idx % 100 == 0:
                 print('Wrote {} of {} articles.'.format(idx, len(article_links)))
-            article_url = urlopen(article)
-            soup_article = BeautifulSoup(article_url, 'html.parser')
+            page = urlopen(url)
+            soup_article = BeautifulSoup(page, 'html.parser')
             article = soup_article.find("div", {"class": "entry-content"}).findAll('p')
             text = ''
             for idy, element in enumerate(article):
@@ -70,9 +81,11 @@ def scrape():
                     text += ''.join(element.findAll(text=True))
             text = re.sub(r"\b[A-Z]+(?:\s+[A-Z]+)*\b. ", '', text)  # remove uppercased city
             if text:
-                fields = [article_url,
+                fields = [url,
                           text]
-                with open(RESULTPATH + '\\jf.csv', 'a+', encoding='utf-8', newline='') as f:
+                result_article_file = RESULTPATH + '\\jf.csv'
+                Path(result_article_file).touch(exist_ok=True)
+                with open(result_article_file, 'a+', encoding='utf-8', newline='') as f:
                     writer = csv.writer(f, delimiter='|')
                     writer.writerow(fields)
         except Exception:

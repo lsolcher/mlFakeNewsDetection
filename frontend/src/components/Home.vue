@@ -11,14 +11,14 @@
             label="Artikel-link, Tweet-link oder Tweet-id einfügen..."
             placeholder="https://twitter.com/i/web/status/1038073678058139648"
             id="userinput"
-            @keyup.enter="getAnalysisResult()"
+            @keyup.enter="getDNNAnalysisResult()"
             v-model="input"
           ></v-text-field>
         </v-flex>
         <br>
       </v-layout>
     </v-container>
-    <template v-if="!analysisDone">
+    <template v-if="!dnnAnalysisDone">
       <p>Analysiere Link...</p>
       <v-progress-circular
         indeterminate
@@ -27,11 +27,27 @@
     </template>
     <template v-else>
       <v-btn
-        @click="getAnalysisResult()"
+        @click="getDNNAnalysisResult()"
         :disabled="input === ''"
       >Analysieren</v-btn>
-      <p>{{analysisOutput}}</p>
+      <p>{{dnnAnalysisOutput}}</p>
     </template>
+
+    <template v-if="!bowAnalysisDone">
+      <p>Analysiere Link...</p>
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      ></v-progress-circular>
+    </template>
+    <template v-else>
+      <v-btn
+        @click="getBOWAnalysisResult()"
+        :disabled="input === ''"
+      >Analysieren</v-btn>
+      <p>{{bowAnalysisOutput}}</p>
+    </template>
+
     <template v-if="!scrapingDone">
       <p>Aktualisiere Datenbank...</p>
       <v-progress-circular
@@ -58,9 +74,11 @@
       return {
         randomNumber: 0,
         input: '',
-        analysisOutput: '',
+        dnnAnalysisOutput: '',
+        bowAnalysisOutput: '',
         scrapingOutput: '',
-        analysisDone: true,
+        dnnAnalysisDone: true,
+        bowAnalysisDone: true,
         scrapingDone: true
       }
     },
@@ -69,26 +87,48 @@
         this.scrapingDone = false;
         this.scrapingOutput = this.getScrapingResultFromBackend()
       },
-      getAnalysisResult() {
-        this.analysisDone = false;
+      getDNNAnalysisResult() {
+        this.dnnAnalysisDone = false;
         console.log(this.input);
-        this.analysisOutput = this.getAnalysisResultFromBackend()
+        this.dnnAnalysisOutput = this.getDNNAnalysisResultFromBackend()
       },
-      getAnalysisResultFromBackend() {
-        const path = 'http://localhost:5000/api/analyze'
+      getDNNAnalysisResultFromBackend() {
+        const path = 'http://localhost:5000/api/analyzeDNN'
         axios.get(path, {
           params: {
             input: this.input
           }
         })
           .then(response => {
-            this.analysisOutput = response.data.result;
-            console.log(this.analysisOutput);
-            this.analysisDone = true
+            this.dnnAnalysisOutput = response.data.result;
+            console.log(this.dnnAnalysisOutput);
+            this.dnnAnalysisDone = true
           })
           .catch(error => {
             console.log(error);
-            this.analysisDone = true
+            this.dnnAnalysisDone = true
+          })
+      },
+      getBOWAnalysisResult() {
+        this.dnnAnalysisDone = false;
+        console.log(this.input);
+        this.dnnAnalysisOutput = this.getBOWAnalysisResultFromBackend()
+      },
+      getBOWAnalysisResultFromBackend() {
+        const path = 'http://localhost:5000/api/analyzeBOW'
+        axios.get(path, {
+          params: {
+            input: this.input
+          }
+        })
+          .then(response => {
+            this.dnnAnalysisOutput = response.data.result;
+            console.log(this.dnnAnalysisOutput);
+            this.dnnAnalysisDone = true
+          })
+          .catch(error => {
+            console.log(error);
+            this.dnnAnalysisDone = true
           })
       },
       getScrapingResultFromBackend() {
@@ -107,8 +147,8 @@
     },
     created() {
       // this.getRandom();
-      this.getAnalysisResult();
-      this.scrape()
+      //this.getDNNAnalysisResult();
+      //this.scrape()
     }
   }
 </script>

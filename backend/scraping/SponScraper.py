@@ -13,6 +13,7 @@ import os.path
 import csv
 import traceback
 from backend import constants
+from pathlib import Path
 
 RESULTPATH = constants.ARTICLE_FOLDER
 
@@ -60,15 +61,23 @@ def scrape():
 
             except Exception:
                 logger.exception("Error while fetching links")
-    
-    
-    article_links = list(set(article_links)) # eliminate duplicate entries
+
+    result_url_file = RESULTPATH + '\\spon_urls.txt'
+    Path(result_url_file).touch(exist_ok=True)
+    old_links = set(line.strip() for line in open(result_url_file))
+    article_links = set(article_links)  # eliminate duplicate entries
+    new_links = article_links - old_links # get only new - not already saved urls
+    print('Found {} new items since last scan'.format(len(new_links)))
+    with open(result_url_file, 'a') as f:
+        for item in new_links:
+            f.write("%s\n" % item)
+
     # get article text and save it to file
     print(len(article_links))
-    for idx, article in enumerate(article_links):
+    for idx, url in enumerate(article_links):
         try:
-            article_url = urlopen(article)
-            soup_article = BeautifulSoup(article_url, 'html.parser')
+            page = urlopen(url)
+            soup_article = BeautifulSoup(page, 'html.parser')
             all_text = ''
             for text in soup_article.findAll('p'):
                 all_text += text.getText()
@@ -78,9 +87,11 @@ def scrape():
             all_text = all_text.replace('SPIEGEL+', '')
             all_text = all_text.replace('SPIEGEL', '')
             if all_text:
-                fields = [article_url,
+                fields = [url,
                           all_text]
-                with open(RESULTPATH + '\\spon.csv', 'a+', encoding='utf-8', newline='') as f:
+                result_article_file = RESULTPATH + '\\spon.csv'
+                Path(result_article_file).touch(exist_ok=True)
+                with open(result_article_file, 'a+', encoding='utf-8', newline='') as f:
                     writer = csv.writer(f, delimiter='|')
                     writer.writerow(fields)
         except Exception:
