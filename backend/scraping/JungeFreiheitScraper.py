@@ -65,13 +65,13 @@ def scrape():
             f.write("%s\n" % item)
 
 
-    print('Found {} unique articles in total. Start writing...'.format(len(article_links)))
+    print('Found {} unique articles in total. Start writing...'.format(len(new_links)))
     # get article text and save it to file
-    print(len(article_links))
-    for idx, url in enumerate(article_links):
+    print(len(new_links))
+    for idx, url in enumerate(new_links):
         try:
             if idx % 100 == 0:
-                print('Wrote {} of {} articles.'.format(idx, len(article_links)))
+                print('Wrote {} of {} articles.'.format(idx, len(new_links)))
             page = urlopen(url)
             soup_article = BeautifulSoup(page, 'html.parser')
             article = soup_article.find("div", {"class": "entry-content"}).findAll('p')

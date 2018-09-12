@@ -29,7 +29,7 @@
       <v-btn
         @click="getDNNAnalysisResult()"
         :disabled="input === ''"
-      >Analysieren</v-btn>
+      >Artikel nach Textstil analysieren</v-btn>
       <p>{{dnnAnalysisOutput}}</p>
     </template>
 
@@ -44,7 +44,7 @@
       <v-btn
         @click="getBOWAnalysisResult()"
         :disabled="input === ''"
-      >Analysieren</v-btn>
+      >Ähnliche Artikel in Datenbank finden</v-btn>
       <p>{{bowAnalysisOutput}}</p>
     </template>
 
@@ -93,7 +93,7 @@
         this.dnnAnalysisOutput = this.getDNNAnalysisResultFromBackend()
       },
       getDNNAnalysisResultFromBackend() {
-        const path = 'http://localhost:5000/api/analyzeDNN'
+        const path = 'http://localhost:5000/api/analyzeDNN';
         axios.get(path, {
           params: {
             input: this.input
@@ -115,7 +115,7 @@
         this.dnnAnalysisOutput = this.getBOWAnalysisResultFromBackend()
       },
       getBOWAnalysisResultFromBackend() {
-        const path = 'http://localhost:5000/api/analyzeBOW'
+        const path = 'http://localhost:5000/api/analyzeBOW';
         axios.get(path, {
           params: {
             input: this.input
