@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 from backend.dnnAnalysis import analyzer
 from backend.scraping import scraper
+from backend.bowAnalysis import bow
 from backend import constants
 import requests
 import pickle
@@ -32,7 +33,7 @@ def analyzeDNN():
 @app.route('/api/analyzeBOW')
 def analyzeBOW():
     user_input = request.args.get('input')
-    result = analyzer.analyze_input(user_input)
+    result = bow.bow()
     response = {
         'result': result
     }

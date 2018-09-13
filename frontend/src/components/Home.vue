@@ -50,6 +50,7 @@
 
     <template v-if="!scrapingDone">
       <p>Aktualisiere Datenbank...</p>
+      <p>{{progress}}</p>
       <v-progress-circular
         indeterminate
         color="primary"
@@ -80,15 +81,33 @@
         dnnAnalysisDone: true,
         bowAnalysisDone: true,
         scrapingDone: true,
-        progress: ''
+        progress: '',
+        progressId: 0
       }
     },
     methods: {
       scrape() {
         this.scrapingDone = false;
-        //this.updateProgress(); TODO
+        this.updateProgress();
         this.scrapingOutput = this.getScrapingResultFromBackend()
       },
+      getScrapingResultFromBackend() {
+        const path = 'http://localhost:5000/api/scrape';
+        axios.get(path)
+          .then(response => {
+            this.scrapingOutput = response.data.result;
+            console.log(this.scrapingOutput);
+            this.scrapingDone = true;
+            clearInterval(this.progressId)
+          })
+          .catch(error => {
+            console.log(error);
+            this.scrapingOutput = "Ein unerwarteter Fehler ist aufgetreten";
+            this.scrapingDone = true
+          })
+      },
+
+
       getDNNAnalysisResult() {
         this.dnnAnalysisDone = false;
         console.log(this.input);
@@ -111,10 +130,12 @@
             this.dnnAnalysisDone = true
           })
       },
+
+
       getBOWAnalysisResult() {
-        this.dnnAnalysisDone = false;
+        this.bowAnalysisDone = false;
         console.log(this.input);
-        this.dnnAnalysisOutput = this.getBOWAnalysisResultFromBackend()
+        this.bowAnalysisOutput = this.getBOWAnalysisResultFromBackend()
       },
       getBOWAnalysisResultFromBackend() {
         const path = 'http://localhost:5000/api/analyzeBOW';
@@ -124,32 +145,20 @@
           }
         })
           .then(response => {
-            this.dnnAnalysisOutput = response.data.result;
-            console.log(this.dnnAnalysisOutput);
-            this.dnnAnalysisDone = true
+            this.bowAnalysisOutput = response.data.result;
+            console.log(this.bowAnalysisOutput);
+            this.bowAnalysisDone = true
           })
           .catch(error => {
             console.log(error);
-            this.dnnAnalysisDone = true
+            this.bowAnalysisDone = true
           })
       },
-      getScrapingResultFromBackend() {
-        const path = 'http://localhost:5000/api/scrape';
-        axios.get(path)
-          .then(response => {
-            this.scrapingOutput = response.data.result;
-            console.log(this.scrapingOutput);
-            this.scrapingDone = true
-          })
-          .catch(error => {
-            console.log(error);
-            this.scrapingOutput = "Ein unerwarteter Fehler ist aufgetreten";
-            this.scrapingDone = true
-          })
-      },
+
+
       //TODO:
       updateProgress() {
-        setInterval(function () {
+        this.progressId = setInterval(function () {
           this.readProgress();
         }.bind(this), 3000);
       },
@@ -158,7 +167,6 @@
         axios.get(path)
           .then(response => {
             this.progress = response.data;
-            console.log(response.data.result);
             console.log(this.progress)
           })
           .catch(error => {
