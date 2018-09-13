@@ -9,3 +9,5 @@ ARTICLE_TEXT_MODEL_FOLDER = os.path.join(DATAFOLDER,'obj/twitter/article_text/')
 TWEET_TEXT_MODEL_FOLDER = os.path.join(DATAFOLDER,'obj/twitter/tweet_text/')
 OBJECT_FOLDER = os.path.join(DATAFOLDER,'obj/')
 ARTICLE_FOLDER = os.path.join(DATAFOLDER,'articles/')
+
+PROGRESSFILE = DATAFOLDER + '//progress.p'

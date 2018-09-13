@@ -41,7 +41,7 @@ def scrape():
     # get all article URLs
     article_links = set()
     for i, category in enumerate(soup_mainpages):
-        for iteration in range(0, 100):
+        for iteration in range(0, 10):
             try:
                 if iteration > 0:
                     nextUrlTag = category.find('a', href=True, text='Mehr Artikel')

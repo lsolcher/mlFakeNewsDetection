@@ -13,10 +13,11 @@ import os.path
 import csv
 from backend import constants
 from pathlib import Path
+from .utils import update_progress
 
 RESULTPATH = constants.ARTICLE_FOLDER
-
-def scrape():
+PROGRESSFILE = constants.PROGRESSFILE
+def scrape(progress):
     if not os.path.exists(RESULTPATH):
         os.makedirs(RESULTPATH)
     logger = logging.getLogger('root')
@@ -33,6 +34,9 @@ def scrape():
         PAGE.append(None)
 
     max_pages = 10
+    progress.append('Analysiere aktuelle Artikel von www.sueddeutsche.de')
+    # progress.progress_value = 0
+    update_progress(progress)
 
     # get all article URLs
     article_links = set()
@@ -55,6 +59,8 @@ def scrape():
                         article_links.add(link['href'])
                         if len(article_links) % 100 == 0:
                             print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
+                            progress.append('Sammle Artikel... \n Bisher wurden {} Artikel gefunden'.format(len(article_links)))
+                            update_progress(progress)
                 if iteration == max_pages - 1:
                     print('Done with category {}. Moving to the next one.'.format(i))
             except TypeError:
@@ -64,6 +70,10 @@ def scrape():
             except Exception:
                 logger.exception("Error while fetching links")
 
+    progress.append('Neue Artikel gesammelt! \n Insgesamt wurden {} Artikel gefunden.'.format(len(article_links)))
+    progress.append('Gleiche mit Datenbank ab...')
+    # progress.progress_value = 11
+    update_progress(progress)
     result_url_file = RESULTPATH + '\\sz_urls.txt'
     Path(result_url_file).touch(exist_ok=True)
     old_links = set(line.strip() for line in open(result_url_file))
@@ -73,7 +83,8 @@ def scrape():
     with open(result_url_file, 'a') as f:
         for item in new_links:
             f.write("%s\n" % item)
-
+    progress.append('{} neue Artikel seit dem letzten Scan gefunden. \n Schreibe Artikel in Datenbank...'.format(len(new_links)))
+    update_progress(progress)
     # get article text and save it to file
     print(len(new_links))
     for idx, url in enumerate(new_links):
@@ -96,9 +107,19 @@ def scrape():
                         writer.writerow(fields)
             if idx % 100 == 0:
                 print('Scraped {} of {} articles'.format(idx, len(new_links)))
+                progress.append('Schreibe Artikel... \n Bisher wurden {} von {} Artikel geschrieben.'.format\
+                    (idx, len(article_links)))
+                update_progress(progress)
+
         except Exception:
             print(Exception)
             logger.exception("Error while parsing")
+    progress.append('Datenbank mit neuesten Artikeln von www.sueddeutsche.de erfolgreich aktualisiert! \n \n Insgesamt wurden {} neue Artikel in die Datenbank geschrieben.'.format(len(new_links)))
+    # progress.progress_value = 33
+    update_progress(progress)
+    return progress
+
+
 
 
 

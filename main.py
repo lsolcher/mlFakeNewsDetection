@@ -1,8 +1,10 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
-from backend.analysis import analyzer
+from backend.dnnAnalysis import analyzer
 from backend.scraping import scraper
+from backend import constants
 import requests
+import pickle
 
 
 app = Flask(__name__,
@@ -44,6 +46,13 @@ def scrape():
         'result': result
     }
     return jsonify(response)
+
+@app.route('/api/scrape_progress')
+def scrape_progress():
+    with open(constants.PROGRESSFILE, 'rb') as fp:
+        progress = pickle.load(fp)
+        print(jsonify(progress))
+    return jsonify(progress)
 
 
 @app.route('/', defaults={'path': ''})

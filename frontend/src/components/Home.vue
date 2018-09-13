@@ -79,12 +79,14 @@
         scrapingOutput: '',
         dnnAnalysisDone: true,
         bowAnalysisDone: true,
-        scrapingDone: true
+        scrapingDone: true,
+        progress: ''
       }
     },
     methods: {
       scrape() {
         this.scrapingDone = false;
+        //this.updateProgress(); TODO
         this.scrapingOutput = this.getScrapingResultFromBackend()
       },
       getDNNAnalysisResult() {
@@ -141,7 +143,26 @@
           })
           .catch(error => {
             console.log(error);
+            this.scrapingOutput = "Ein unerwarteter Fehler ist aufgetreten";
             this.scrapingDone = true
+          })
+      },
+      //TODO:
+      updateProgress() {
+        setInterval(function () {
+          this.readProgress();
+        }.bind(this), 3000);
+      },
+      readProgress() {
+        const path = 'http://localhost:5000/api/scrape_progress';
+        axios.get(path)
+          .then(response => {
+            this.progress = response.data;
+            console.log(response.data.result);
+            console.log(this.progress)
+          })
+          .catch(error => {
+            console.log(error);
           })
       }
     },
