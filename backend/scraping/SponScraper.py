@@ -8,22 +8,15 @@ Created on Sat May 26 18:09:57 2018
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import re
-import logging
-import os.path
 import csv
 import traceback
 from backend import constants
+from .utils import update_progress
 from pathlib import Path
 
 RESULTPATH = constants.ARTICLE_FOLDER
 
-
-def scrape():
-    if not os.path.exists(RESULTPATH):
-        os.makedirs(RESULTPATH)
-    logger = logging.getLogger('root')
-    logger.info('start scraping spon')
-
+def scrape(progress):
     # Websites to scrape
     URL = []
     URL.append('http://www.spiegel.de/politik/')
@@ -37,6 +30,11 @@ def scrape():
     soup_mainpages = []
     for page in PAGE:
         soup_mainpages.append(BeautifulSoup(page, 'html.parser'))
+
+    progress.append('Analysiere aktuelle Artikel von www.sueddeutsche.de')
+    progress.append('Sammle Artikel...')
+    # progress.progress_value = 0
+    update_progress(progress)
 
     # get all article URLs
     article_links = set()
@@ -54,13 +52,20 @@ def scrape():
                         article_links.add('http://www.spiegel.de' + link['href'])
                         if len(article_links) % 100 == 0:
                             print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
+                            progress.append('Bisher wurden {} Artikel gefunden'.format(len(article_links)))
+                            update_progress(progress)
 
             except TypeError:
-                logger.exception('Done with category {}. Moving to the next one.'.format(i))
+                traceback.print_exc()
                 i += 1
-
             except Exception:
-                logger.exception("Error while fetching links")
+                traceback.print_exc()
+
+    progress.append('Neue Artikel gesammelt!')
+    progress.append('Insgesamt wurden {} Artikel gefunden.'.format(len(article_links)))
+    progress.append('Gleiche mit Datenbank ab...')
+    # progress.progress_value = 11
+    update_progress(progress)
 
     result_url_file = RESULTPATH + '\\spon_urls.txt'
     Path(result_url_file).touch(exist_ok=True)
@@ -72,7 +77,10 @@ def scrape():
         for item in new_links:
             f.write("%s\n" % item)
 
+    progress.append('{} neue Artikel seit dem letzten Scan gefunden. \n Schreibe Artikel in Datenbank...'.format(len(new_links)))
+    update_progress(progress)
     print('Found {} unique articles in total. Start writing...'.format(len(new_links)))
+
     # get article text and save it to file
     print(len(new_links))
     for idx, url in enumerate(new_links):
@@ -95,11 +103,20 @@ def scrape():
                 with open(result_article_file, 'a+', encoding='utf-8', newline='') as f:
                     writer = csv.writer(f, delimiter='|')
                     writer.writerow(fields)
+            if idx % 100 == 0:
+                print('Scraped {} of {} articles'.format(idx, len(new_links)))
+                progress.append('Schreibe Artikel... \n Bisher wurden {} von {} Artikel geschrieben.'.format\
+                    (idx, len(new_links)))
+                update_progress(progress)
         except Exception:
-            logger.exception("Error while parsing")
             traceback.print_exc()
 
-                
+
+    progress.append('Datenbank mit neuesten Artikeln von www.spiegel.de erfolgreich aktualisiert!')
+    progress.append('Insgesamt wurden {} neue Artikel in die Datenbank geschrieben.'.format(len(new_links)))
+    # progress.progress_value = 33
+    update_progress(progress)
+    return progress
     
     
 

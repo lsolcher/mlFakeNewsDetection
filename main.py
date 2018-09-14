@@ -43,7 +43,7 @@ def createBow():
 def getBOW():
     user_input = request.args.get('input')
     print(user_input)
-    result = bow.analyse_bow(user_input)
+    result = bow.get_bow_result(user_input)
     response = {
         'result': result
     }
@@ -68,7 +68,7 @@ def scrape():
 
 @app.route('/api/scrape_progress')
 def scrape_progress():
-    with open(constants.PROGRESSFILE, 'rb') as fp:
+    with open(constants.PROGRESSFILE_SCRAPER, 'rb') as fp:
         progress = pickle.load(fp)
         print(jsonify(progress))
     return jsonify(progress)

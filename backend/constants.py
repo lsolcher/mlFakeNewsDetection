@@ -11,8 +11,9 @@ OBJECT_FOLDER = os.path.join(DATAFOLDER,'obj/')
 ARTICLE_FOLDER = os.path.join(DATAFOLDER,'articles/')
 BOW_FOLDER = os.path.join(DATAFOLDER,'bow/')
 
-PROGRESSFILE = DATAFOLDER + '//progress.p' # scraper
+PROGRESSFILE_SCRAPER = ARTICLE_FOLDER + '//progress.p' # scraper
 PROGRESSFILE_BOW = BOW_FOLDER + '//progress.p'
+RESULTFILE_BOW = BOW_FOLDER + '//result.csv'
 
 
 asecret = 'Vy5hWwthlxuU6qSVoq91Bb4TjfJo9sHSrmx66BN04zoTX'

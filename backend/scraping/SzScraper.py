@@ -7,22 +7,15 @@ Created on Sat May 26 18:09:57 2018
 
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-import re
-import logging
-import os.path
-import csv
+import re, traceback, csv
 from backend import constants
 from pathlib import Path
 from .utils import update_progress
 
-RESULTPATH = constants.ARTICLE_FOLDER
-PROGRESSFILE = constants.PROGRESSFILE
-def scrape(progress):
-    if not os.path.exists(RESULTPATH):
-        os.makedirs(RESULTPATH)
-    logger = logging.getLogger('root')
-    logger.info('start scraping spon')
 
+RESULTPATH = constants.ARTICLE_FOLDER
+
+def scrape(progress):
     # Websites to scrape
     URL = []
     URL.append('https://www.sueddeutsche.de/archiv/politik/2018/page/')
@@ -35,6 +28,7 @@ def scrape(progress):
 
     max_pages = 10
     progress.append('Analysiere aktuelle Artikel von www.sueddeutsche.de')
+    progress.append('Sammle Artikel...')
     # progress.progress_value = 0
     update_progress(progress)
 
@@ -59,18 +53,19 @@ def scrape(progress):
                         article_links.add(link['href'])
                         if len(article_links) % 100 == 0:
                             print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
-                            progress.append('Sammle Artikel... \n Bisher wurden {} Artikel gefunden'.format(len(article_links)))
+                            progress.append('Bisher wurden {} Artikel gefunden'.format(len(article_links)))
                             update_progress(progress)
                 if iteration == max_pages - 1:
                     print('Done with category {}. Moving to the next one.'.format(i))
             except TypeError:
-                logger.exception('Done with category {}. Moving to the next one.'.format(i))
+                traceback.print_exc()
                 i += 1
-
             except Exception:
-                logger.exception("Error while fetching links")
+                traceback.print_exc()
 
-    progress.append('Neue Artikel gesammelt! \n Insgesamt wurden {} Artikel gefunden.'.format(len(article_links)))
+
+    progress.append('Neue Artikel gesammelt!')
+    progress.append('Insgesamt wurden {} Artikel gefunden.'.format(len(article_links)))
     progress.append('Gleiche mit Datenbank ab...')
     # progress.progress_value = 11
     update_progress(progress)
@@ -113,8 +108,10 @@ def scrape(progress):
 
         except Exception:
             print(Exception)
-            logger.exception("Error while parsing")
-    progress.append('Datenbank mit neuesten Artikeln von www.sueddeutsche.de erfolgreich aktualisiert! \n \n Insgesamt wurden {} neue Artikel in die Datenbank geschrieben.'.format(len(new_links)))
+            traceback.print_exc()
+
+    progress.append('Datenbank mit neuesten Artikeln von www.sueddeutsche.de erfolgreich aktualisiert!')
+    progress.append('Insgesamt wurden {} neue Artikel in die Datenbank geschrieben.'.format(len(new_links)))
     # progress.progress_value = 33
     update_progress(progress)
     return progress

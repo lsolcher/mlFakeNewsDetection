@@ -1,6 +1,7 @@
 from .. import constants
 from . import preprocessor, utils
-import time
+import time, os
+from pathlib import Path
 
 BOW_FOLDER = constants.BOW_FOLDER
 test_string = ''
@@ -11,11 +12,9 @@ def create_bow_model():
 
 
 
-def analyse_bow(input_url):
+def get_bow_result(input_url):
     success, article_text = utils.process_article(input_url)
-    print(success)
-    print(article_text)
-    return article_text
+    prepare_result_file()
     counts = utils.load_obj(BOW_FOLDER, 'counts', test_string)
     word_list = utils.load_obj(BOW_FOLDER, 'word_list', test_string)
     tokens = utils.load_obj(BOW_FOLDER, 'tokens', test_string)
@@ -36,24 +35,28 @@ def analyse_bow(input_url):
     # for i, counter in enumerate(counts):
     #   bow_row = [counter.get(term, 0) for term in vocab[i]]
     #  bow.append(bow_row)
-    resultfile = 'C:/Programmierung/Masterarbeit/Analyzer/results/results.csv'
-    if not os.path.exists(resultfile):
 
-        print('calculating similarities...')
-        similarities = {}
-        for i, c in counts.items():
-            for j, c1 in counts.items():
-                author1 = " ".join(re.findall("[a-zA-Z]+", i))
-                author2 = " ".join(re.findall("[a-zA-Z]+", j))
-                if author1 != author2 and i < j:
-                    similarities[i + ' : ' + j] = counter_cosine_similarity(counts[i], counts[j])
 
-        sorted_sims = sorted(similarities.items(), key=operator.itemgetter(1), reverse=True)
-        end = time.time()
-        print('done! took ', end - start, ' seconds.')
+    print('calculating similarities...')
+    similarities = {}
+    for i, c in counts.items():
+        for j, c1 in counts.items():
+            author1 = " ".join(re.findall("[a-zA-Z]+", i))
+            author2 = " ".join(re.findall("[a-zA-Z]+", j))
+            if author1 != author2 and i < j:
+                similarities[i + ' : ' + j] = counter_cosine_similarity(counts[i], counts[j])
 
-        with open(resultfile, 'w', newline='', encoding='utf-8-sig') as f:
-            w = csv.writer(f)
-            w.writerows(sorted_sims)
+    sorted_sims = sorted(similarities.items(), key=operator.itemgetter(1), reverse=True)
+    end = time.time()
+    print('done! took ', end - start, ' seconds.')
+
+    with open(resultfile, 'w', newline='', encoding='utf-8-sig') as f:
+        w = csv.writer(f)
+        w.writerows(sorted_sims)
 
     return True
+
+def prepare_result_file():
+    Path(constants.RESULTFILE_BOW).touch(exist_ok=True)
+    with open(constants.RESULTFILE_BOW, "w"):
+        pass

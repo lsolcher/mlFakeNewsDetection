@@ -9,16 +9,14 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import re
 import csv
-import os.path
 import traceback
 from backend import constants
 from pathlib import Path
+from .utils import update_progress
 
 RESULTPATH = constants.ARTICLE_FOLDER
 
-def scrape():
-    if not os.path.exists(RESULTPATH):
-        os.makedirs(RESULTPATH)
+def scrape(progress):
     # Websites to scrape
     URL = []
     URL.append('https://jungefreiheit.de/kategorie/politik/')
@@ -33,10 +31,15 @@ def scrape():
     for page in PAGE:
         soup_mainpages.append(BeautifulSoup(page, 'html.parser'))
 
+    progress.append('Analysiere aktuelle Artikel von www.jungefreiheit.de')
+    progress.append('Sammle Artikel...')
+    # progress.progress_value = 0
+    update_progress(progress)
+
     # get all article URLs
     article_links = set()
     for i, category in enumerate(soup_mainpages):
-        for iteration in range(0, 10):
+        for iteration in range(0, 100):
             try:
                 if iteration > 0:
                     nextUrlTag = category.find('a', href=True, text=re.compile('Nächste Seite'))
@@ -48,12 +51,20 @@ def scrape():
                         article_links.add(link['href'])
                         if len(article_links) % 100 == 0:
                             print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
+                            progress.append('Bisher wurden {} Artikel gefunden'.format(len(article_links)))
+                            update_progress(progress)
             except TypeError:
+                traceback.print_exc()
                 iteration = 100
                 i += 1
             except Exception:
                 traceback.print_exc()
 
+    progress.append('Neue Artikel gesammelt!')
+    progress.append('Insgesamt wurden {} Artikel gefunden.'.format(len(article_links)))
+    progress.append('Gleiche mit Datenbank ab...')
+    # progress.progress_value = 11
+    update_progress(progress)
     result_url_file = RESULTPATH + '\\jf_urls.txt'
     Path(result_url_file).touch(exist_ok=True)
     old_links = set(line.strip() for line in open(result_url_file))
@@ -63,7 +74,8 @@ def scrape():
     with open(result_url_file, 'a') as f:
         for item in new_links:
             f.write("%s\n" % item)
-
+    progress.append('{} neue Artikel seit dem letzten Scan gefunden. \n Schreibe Artikel in Datenbank...'.format(len(new_links)))
+    update_progress(progress)
 
     print('Found {} unique articles in total. Start writing...'.format(len(new_links)))
     # get article text and save it to file
@@ -72,6 +84,9 @@ def scrape():
         try:
             if idx % 100 == 0:
                 print('Wrote {} of {} articles.'.format(idx, len(new_links)))
+                progress.append('Schreibe Artikel... \n Bisher wurden {} von {} Artikel geschrieben.'.format\
+                    (idx, len(new_links)))
+                update_progress(progress)
             page = urlopen(url)
             soup_article = BeautifulSoup(page, 'html.parser')
             article = soup_article.find("div", {"class": "entry-content"}).findAll('p')
@@ -92,5 +107,9 @@ def scrape():
             print(Exception)
             traceback.print_exc()
 
-
+    progress.append('Datenbank mit neuesten Artikeln von www.jungefreiheit.de erfolgreich aktualisiert!')
+    progress.append('Insgesamt wurden {} neue Artikel in die Datenbank geschrieben.'.format(len(new_links)))
+    # progress.progress_value = 33
+    update_progress(progress)
+    return progress
 

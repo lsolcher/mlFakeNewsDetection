@@ -13,7 +13,9 @@
         <v-btn
           @click="scrape()"
         >Artikeldatenbank aktualisieren</v-btn>
-        <p>{{scrapingOutput}}</p>
+        <li v-for="msg in scrapeProgress">
+          {{ msg }}
+        </li>
       </template>
 
     </div>
@@ -73,7 +75,7 @@
       },
       killThreads() {
         let id = window.setTimeout(function() {}, 0);
-        console.log(id)
+        console.log(id);
         while (id--) {
           clearInterval(id);
         }
