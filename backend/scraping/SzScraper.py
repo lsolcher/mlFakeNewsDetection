@@ -53,8 +53,12 @@ def scrape(progress):
                         article_links.add(link['href'])
                         if len(article_links) % 100 == 0:
                             print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
-                            progress.append('Bisher wurden {} Artikel gefunden'.format(len(article_links)))
-                            update_progress(progress)
+                            prog_str = ('Bisher wurden {} Artikel gefunden'.format(len(article_links)))
+                            if prog_str not in progress:
+                                # because some article urls are found more than once and
+                                # won't be added twice but counting still thinks somethin new is added
+                                progress.append(prog_str)
+                                update_progress(progress)
                 if iteration == max_pages - 1:
                     print('Done with category {}. Moving to the next one.'.format(i))
             except TypeError:
