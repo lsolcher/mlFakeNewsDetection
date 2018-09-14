@@ -33,8 +33,11 @@
       <p>{{dnnAnalysisOutput}}</p>
     </template>
 
+
+
     <template v-if="!bowAnalysisDone">
       <p>Analysiere Link...</p>
+      <p>{{bowProgress}}</p>
       <v-progress-circular
         indeterminate
         color="primary"
@@ -48,9 +51,11 @@
       <p>{{bowAnalysisOutput}}</p>
     </template>
 
+
+
     <template v-if="!scrapingDone">
       <p>Aktualisiere Datenbank...</p>
-      <p>{{progress}}</p>
+      <p>{{scrapeProgress}}</p>
       <v-progress-circular
         indeterminate
         color="primary"
@@ -81,14 +86,16 @@
         dnnAnalysisDone: true,
         bowAnalysisDone: true,
         scrapingDone: true,
-        progress: '',
-        progressId: 0
+        scrapeProgress: '',
+        bowProgress: '',
+        scrapeProgressId: 0,
+        bowProgressId: 0
       }
     },
     methods: {
       scrape() {
         this.scrapingDone = false;
-        this.updateProgress();
+        this.updateScrapeProgress();
         this.scrapingOutput = this.getScrapingResultFromBackend()
       },
       getScrapingResultFromBackend() {
@@ -98,12 +105,30 @@
             this.scrapingOutput = response.data.result;
             console.log(this.scrapingOutput);
             this.scrapingDone = true;
-            clearInterval(this.progressId)
+            clearInterval(this.scrapeProgressId)
           })
           .catch(error => {
             console.log(error);
             this.scrapingOutput = "Ein unerwarteter Fehler ist aufgetreten";
             this.scrapingDone = true
+          })
+      },
+
+      //TODO:
+      updateScrapeProgress() {
+        this.scrapeProgressId = setInterval(function () {
+          this.readScrapeProgress();
+        }.bind(this), 3000);
+      },
+      readScrapeProgress() {
+        const path = 'http://localhost:5000/api/scrape_progress';
+        axios.get(path)
+          .then(response => {
+            this.scrapeProgress = response.data;
+            console.log(this.scrapeProgress)
+          })
+          .catch(error => {
+            console.log(error);
           })
       },
 
@@ -135,6 +160,7 @@
       getBOWAnalysisResult() {
         this.bowAnalysisDone = false;
         console.log(this.input);
+        this.updateBowProgress();
         this.bowAnalysisOutput = this.getBOWAnalysisResultFromBackend()
       },
       getBOWAnalysisResultFromBackend() {
@@ -147,7 +173,8 @@
           .then(response => {
             this.bowAnalysisOutput = response.data.result;
             console.log(this.bowAnalysisOutput);
-            this.bowAnalysisDone = true
+            this.bowAnalysisDone = true;
+            clearInterval(this.bowProgressId)
           })
           .catch(error => {
             console.log(error);
@@ -155,26 +182,38 @@
           })
       },
 
-
-      //TODO:
-      updateProgress() {
-        this.progressId = setInterval(function () {
-          this.readProgress();
+      updateBowProgress() {
+        this.bowProgressId = setInterval(function () {
+          this.readBowProgress();
         }.bind(this), 3000);
       },
-      readProgress() {
-        const path = 'http://localhost:5000/api/scrape_progress';
+      readBowProgress() {
+        const path = 'http://localhost:5000/api/bow_progress';
         axios.get(path)
           .then(response => {
-            this.progress = response.data;
-            console.log(this.progress)
+            this.bowProgress = response.data;
+            console.log(this.bowProgress)
           })
           .catch(error => {
             console.log(error);
           })
+      },
+
+
+
+      killThreads() {
+        let id = window.setTimeout(function() {}, 0);
+        console.log(id)
+        while (id--) {
+          clearInterval(id);
+        }
+
       }
+
+
     },
     created() {
+      this.killThreads()
       // this.getRandom();
       //this.getDNNAnalysisResult();
       //this.scrape()

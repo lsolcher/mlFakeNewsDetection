@@ -1,64 +1,101 @@
-import time
+import time, traceback
 from collections import Counter
 import os
 from .. import constants
 from . import utils, Tokenizer, Normalizer, Tagger, Lemmatizer
+from .utils import update_progress
 
 
 BOW_FOLDER = constants.BOW_FOLDER
 test_string=''
 
 
-def preprocess_tokens_per_document_from_csv():
+def create_word_models():
     """
     Takes in a directory, parses the texts in each subdirectory and tokenizes each document
     :param direct:
     :param test_string: optional for testing
     :return:
     """
-    if os.path.isfile(BOW_FOLDER + '/counts' + test_string + '.pkl') and \
-        os.path.isfile(BOW_FOLDER + '/word_list' + test_string + '.pkl') and \
-        os.path.isfile(BOW_FOLDER + '/tokens' + test_string + '.pkl'):
-        counts = utils.load_obj(BOW_FOLDER, 'counts', test_string)
-        word_list = utils.load_obj(BOW_FOLDER, 'word_list', test_string)
-        tokens = utils.load_obj(BOW_FOLDER, 'tokens', test_string)
-    else:
-        start = time.time()
-        print('tokenizing...')
-        tokens = Tokenizer.tokenize_from_dir_to_tokens_per_document()
-        end = time.time()
-        print('done! took ', end - start, ' seconds.')
-        start = time.time()
+    try:
+        if os.path.isfile(BOW_FOLDER + '/counts' + test_string + '.pkl') and \
+            os.path.isfile(BOW_FOLDER + '/word_list' + test_string + '.pkl') and \
+            os.path.isfile(BOW_FOLDER + '/tokens' + test_string + '.pkl'):
+            # counts = utils.load_obj(BOW_FOLDER, 'counts', test_string)
+            # word_list = utils.load_obj(BOW_FOLDER, 'word_list', test_string)
+            # tokens = utils.load_obj(BOW_FOLDER, 'tokens', test_string)
+            return 'Objects already created'
+        else:
+            progress = []
+            start = time.time()
+            print('tokenizing...')
+            progress.append('Tokenisiere...')
+            update_progress(progress)
+            tokens = Tokenizer.tokenize_from_dir_to_tokens_per_csv()
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Artikel tokenisiert in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
 
-        print('tagging...')
-        tokens = Tagger.tag(tokens)
-        end = time.time()
-        print('done! took ', end - start, ' seconds.')
-        start = time.time()
-        print('normalizing...')
-        tokens = Normalizer.normalize(tokens)
-        end = time.time()
-        print('done! took ', end - start, ' seconds.')
-        start = time.time()
-        print('lemmatizing...')
-        tokens = Lemmatizer.lemmatize_tokens(tokens)
-        end = time.time()
-        print('done! took ', end - start, ' seconds.')
-        start = time.time()
-        print('counting...')
-        word_list = {}
-        for idx, token in tokens.items():
-            word_list[idx] = ([t[0] for t in token])
-        counts = {}
-        print('counting...')
-        for idx, item in word_list.items():
-            counts[idx] = Counter(item)
-        end = time.time()
-        print('done! took ', end - start, ' seconds.')
-        utils.save_obj(counts, 'counts', test_string)
-        utils.save_obj(word_list, 'word_list', test_string)
-        utils.save_obj(tokens, 'tokens', test_string)
-    return counts, word_list, tokens
+
+            start = time.time()
+            print('tagging...')
+            progress.append('Tagge...')
+            update_progress(progress)
+            tokens = Tagger.tag(tokens)
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Artikel getaggt in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            start = time.time()
+            print('normalizing...')
+            progress.append('Normalisiere...')
+            update_progress(progress)
+            tokens = Normalizer.normalize(tokens)
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Artikel normalisiert in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            start = time.time()
+            print('lemmatizing...')
+            progress.append('Lemmatisiere...')
+            update_progress(progress)
+            tokens = Lemmatizer.lemmatize_tokens(tokens)
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Artikel lemmatisiert in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            start = time.time()
+            print('counting...')
+            progress.append('Zähle...')
+            update_progress(progress)
+            word_list = {}
+            for idx, token in tokens.items():
+                word_list[idx] = ([t[0] for t in token])
+            counts = {}
+            for idx, item in word_list.items():
+                counts[idx] = Counter(item)
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Wörter gezählt in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            utils.save_obj(counts, BOW_FOLDER, 'counts', test_string)
+            utils.save_obj(word_list, BOW_FOLDER, 'word_list', test_string)
+            utils.save_obj(tokens, BOW_FOLDER, 'tokens', test_string)
+            progress.append('BOW-Modell erstellt!')
+            update_progress(progress)
+            return 'Successfully created word models from database'
+    except:
+        traceback.print_exc()
+        return 'An error occurred creating word models'
 
 """
 def has_sub_folder(path_to_parent):

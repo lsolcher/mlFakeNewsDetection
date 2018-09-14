@@ -1,4 +1,4 @@
-from germalemma import GermaLemma
+from germalemma.germalemma import GermaLemma
 
 
 def lemmatize_tokens(tokens):

@@ -33,11 +33,19 @@ def analyzeDNN():
 @app.route('/api/analyzeBOW')
 def analyzeBOW():
     user_input = request.args.get('input')
-    result = bow.bow()
+    result = bow.create_bow_model()
     response = {
         'result': result
     }
     return jsonify(response)
+
+
+@app.route('/api/bow_progress')
+def bow_progress():
+    with open(constants.PROGRESSFILE_BOW, 'rb') as fp:
+        progress = pickle.load(fp)
+        print(jsonify(progress))
+    return jsonify(progress)
 
 
 @app.route('/api/scrape')

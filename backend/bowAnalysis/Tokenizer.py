@@ -9,7 +9,6 @@ import nltk
 import logging
 import os.path
 import csv
-import pandas as pd
 
 ARTICLE_FOLDER = constants.ARTICLE_FOLDER
 
@@ -27,10 +26,10 @@ def tokenize_from_dir_to_tokens_per_csv():
     tokens = {}
     for file in os.listdir(ARTICLE_FOLDER):
         if file.endswith(".csv"):
-            reader = csv.reader(file, delimiter='|')
-            for row in reader:
-                print(row)
-                tokens[row[0]] = nltk.word_tokenize(row[1], language='german')
+            with open(os.path.join(ARTICLE_FOLDER, file), 'r', encoding='utf-8') as csvfile:
+                reader = csv.reader(csvfile, delimiter='|')
+                for row in reader:
+                    tokens[row[0]] = nltk.word_tokenize(row[1], language='german')
 
     return tokens
 

@@ -108,7 +108,7 @@ def scrape(progress):
             if idx % 100 == 0:
                 print('Scraped {} of {} articles'.format(idx, len(new_links)))
                 progress.append('Schreibe Artikel... \n Bisher wurden {} von {} Artikel geschrieben.'.format\
-                    (idx, len(article_links)))
+                    (idx, len(new_links)))
                 update_progress(progress)
 
         except Exception:

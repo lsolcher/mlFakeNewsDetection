@@ -1,13 +1,22 @@
 from .. import constants
-from . import preprocessor
+from . import preprocessor, utils
 import time
 
+BOW_FOLDER = constants.BOW_FOLDER
+test_string = ''
 
-def bow():
+def create_bow_model():
+    result = preprocessor.create_word_models()
+    return result
 
-    counts, word_list, tokens = preprocessor.preprocess_tokens_per_document_from_csv()
 
-    #BOW
+
+def analyse_bow():
+    counts = utils.load_obj(BOW_FOLDER, 'counts', test_string)
+    word_list = utils.load_obj(BOW_FOLDER, 'word_list', test_string)
+    tokens = utils.load_obj(BOW_FOLDER, 'tokens', test_string)
+    # 
+    # BOW
     start = time.time()
     vocab = []
     for l in word_list:
@@ -42,5 +51,5 @@ def bow():
         with open(resultfile, 'w', newline='', encoding='utf-8-sig') as f:
             w = csv.writer(f)
             w.writerows(sorted_sims)
-            
+
     return True
