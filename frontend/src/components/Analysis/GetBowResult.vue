@@ -14,7 +14,7 @@
         :disabled="input === ''"
       >Link auf Wortähnlichkeit untersuchen</v-btn>
       <ul>
-        <p v-for="(item, index) in bowOutput.url"> {{bowOutput.url[index]}} : {{bowOutput.value[index]}}</p>
+        <p v-for="(item, index) in bowOutput.url"> <span v-html="bowOutput.url[index]"></span> : {{bowOutput.value[index]}}</p>
       </ul>
 
     </template>

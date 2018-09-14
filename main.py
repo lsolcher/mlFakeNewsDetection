@@ -49,7 +49,7 @@ def getBOW():
     print(user_input)
     result = bow.get_bow_result(user_input)
     response = {
-        'url': [i[0] for i in result],
+        'url': ['<a href=\"' + i[0] + '\">' + i[0] + '</a>' for i in result],
         'value': [i[1] for i in result]
     }
     return jsonify(response)
