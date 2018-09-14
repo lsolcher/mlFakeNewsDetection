@@ -10,7 +10,98 @@ BOW_FOLDER = constants.BOW_FOLDER
 test_string=''
 
 
-def create_word_models():
+def add_article_to_word_model(url, article):
+    try:
+        if not os.path.isfile(BOW_FOLDER + '/counts' + test_string + '.pkl') or \
+            not os.path.isfile(BOW_FOLDER + '/word_list' + test_string + '.pkl') or  \
+            not os.path.isfile(BOW_FOLDER + '/tokens' + test_string + '.pkl'):
+            return 'Es sind keine Wortmodelle zu Artikeln vorhanden. Bitte diese zuerst erstellen.'
+        else:
+            progress = []
+            start = time.time()
+            print('tokenizing...')
+            progress.append('Tokenisiere...')
+            update_progress(progress)
+            tokens = Tokenizer.tokenize_article(url, article)
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Artikel tokenisiert in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            start = time.time()
+            print('tagging...')
+            progress.append('Tagge...')
+            update_progress(progress)
+            tokens = Tagger.tag(tokens)
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Artikel getaggt in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            start = time.time()
+            print('normalizing...')
+            progress.append('Normalisiere...')
+            update_progress(progress)
+            tokens = Normalizer.normalize(tokens)
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Artikel normalisiert in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            start = time.time()
+            print('lemmatizing...')
+            progress.append('Lemmatisiere...')
+            update_progress(progress)
+            tokens = Lemmatizer.lemmatize_tokens(tokens)
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Artikel lemmatisiert in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            start = time.time()
+            print('counting...')
+            progress.append('Zähle...')
+            update_progress(progress)
+
+
+            word_list = {}
+            for idx, token in tokens.items():
+                word_list[idx] = ([t[0] for t in token])
+            counts = {}
+            for idx, item in word_list.items():
+                counts[idx] = Counter(item)
+
+
+            end = time.time()
+            print('done! took ', end - start, ' seconds.')
+            progress.append('Wörter gezählt in {} Sekunden!\n'.format(end-start))
+            update_progress(progress)
+
+
+            counts = utils.load_obj(BOW_FOLDER, 'counts', test_string)
+            word_list = utils.load_obj(BOW_FOLDER, 'word_list', test_string)
+
+            word_list[url] = ([t[0] for t in token])
+            counts[url] = Counter(word_list[url])
+
+            for idx, token in tokens.items():
+                word_list[idx] = ([t[0] for t in token])
+            for idx, item in word_list.items():
+                counts[idx] = Counter(item)
+
+            progress.append('BOW-Modell erstellt!')
+            update_progress(progress)
+            return word_list, counts
+    except:
+        traceback.print_exc()
+        return None, None
+
+
+def create_word_models_from_database():
     """
     Takes in a directory, parses the texts in each subdirectory and tokenizes each document
     :param direct:

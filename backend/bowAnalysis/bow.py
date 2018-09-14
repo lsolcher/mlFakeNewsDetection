@@ -1,29 +1,29 @@
 from .. import constants
 from . import preprocessor, utils
-import time, os
+import time, math, operator, csv
 from pathlib import Path
 
 BOW_FOLDER = constants.BOW_FOLDER
 test_string = ''
 
 def create_bow_model():
-    result = preprocessor.create_word_models()
+    result = preprocessor.create_word_models_from_database()
     return result
 
 
 
 def get_bow_result(input_url):
     success, article_text = utils.process_article(input_url)
+    word_list, counts = preprocessor.add_article_to_word_model(input_url, article_text)
+    if word_list is None or counts is None:
+        return 'Ein unerwarteter Fehler beim Erstellen des BOW-Modells ist aufgetreten'
     prepare_result_file()
-    counts = utils.load_obj(BOW_FOLDER, 'counts', test_string)
-    word_list = utils.load_obj(BOW_FOLDER, 'word_list', test_string)
-    tokens = utils.load_obj(BOW_FOLDER, 'tokens', test_string)
-    # 
+    #
     # BOW
     start = time.time()
-    vocab = []
-    for l in word_list:
-        vocab.append(set())
+    # vocab = []
+    # for l in word_list:
+    #    vocab.append(set())
 
     # for i, c in enumerate(counts):
     #   vocab[i] |= set(c.keys())
@@ -40,21 +40,27 @@ def get_bow_result(input_url):
     print('calculating similarities...')
     similarities = {}
     for i, c in counts.items():
-        for j, c1 in counts.items():
-            author1 = " ".join(re.findall("[a-zA-Z]+", i))
-            author2 = " ".join(re.findall("[a-zA-Z]+", j))
-            if author1 != author2 and i < j:
-                similarities[i + ' : ' + j] = counter_cosine_similarity(counts[i], counts[j])
+        #if i != input_url:
+        similarities[i] = counter_cosine_similarity(counts[i], counts[input_url])
 
     sorted_sims = sorted(similarities.items(), key=operator.itemgetter(1), reverse=True)
     end = time.time()
     print('done! took ', end - start, ' seconds.')
 
-    with open(resultfile, 'w', newline='', encoding='utf-8-sig') as f:
+    with open(constants.RESULTFILE_BOW, 'w', newline='', encoding='utf-8-sig') as f:
         w = csv.writer(f)
         w.writerows(sorted_sims)
 
-    return True
+    return sorted_sims[:10]
+
+
+def counter_cosine_similarity(c1, c2):
+    terms = set(c1).union(c2)
+    dotprod = sum(c1.get(k, 0) * c2.get(k, 0) for k in terms)
+    magA = math.sqrt(sum(c1.get(k, 0)**2 for k in terms))
+    magB = math.sqrt(sum(c2.get(k, 0)**2 for k in terms))
+    return dotprod / (magA * magB)
+
 
 def prepare_result_file():
     Path(constants.RESULTFILE_BOW).touch(exist_ok=True)

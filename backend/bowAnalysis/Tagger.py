@@ -1,6 +1,4 @@
 import os
-import nltk
-import random
 import pickle
 from .utils import update_progress, get_progress
 from ClassifierBasedGermanTagger import ClassifierBasedGermanTagger

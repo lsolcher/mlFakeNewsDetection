@@ -6,7 +6,6 @@ Created on Fri Jun  8 18:11:24 2018
 """
 from .. import constants
 import nltk
-import logging
 import os.path
 import csv
 
@@ -14,15 +13,6 @@ ARTICLE_FOLDER = constants.ARTICLE_FOLDER
 
 
 def tokenize_from_dir_to_tokens_per_csv():
-    """
-    Takes in a list of directories or a single directory, reads in the text of all .txt in these dir(s) and tokenizes them
-    :param dirpath: a single directory or a list of directories
-    :return:
-    """
-
-    logger = logging.getLogger('root')
-    logger.info('start tokenization')
-
     tokens = {}
     for file in os.listdir(ARTICLE_FOLDER):
         if file.endswith(".csv"):
@@ -31,6 +21,12 @@ def tokenize_from_dir_to_tokens_per_csv():
                 for row in reader:
                     tokens[row[0]] = nltk.word_tokenize(row[1], language='german')
 
+    return tokens
+
+def tokenize_article(url, article):
+    tokens = {}
+    print(article)
+    tokens[url] = nltk.word_tokenize(article, language='german')
     return tokens
 
 
