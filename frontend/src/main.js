@@ -7,6 +7,8 @@ Vue.config.productionTip = false
 
 Vue.use(Vuetify)
 
+export const dataBus = new Vue();
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -19,20 +19,22 @@
 
 <script>
   import axios from 'axios'
+  import { dataBus } from "../../main";
 
   export default {
+    name: 'dnn',
     data() {
       return {
-        input: '',
         dnnAnalysisOutput: '',
         dnnAnalysisDone: true,
+        input: ''
       }
     },
     methods: {
       // ---- DNN ---- //
       getDNNAnalysisResult() {
         this.dnnAnalysisDone = false;
-        console.log(this.input);
+        console.log('INPUT: ' + this.input);
         this.dnnAnalysisOutput = this.getDNNAnalysisResultFromBackend()
       },
       getDNNAnalysisResultFromBackend() {
@@ -52,6 +54,11 @@
             this.dnnAnalysisDone = true
           })
       }
+    },
+    mounted() {
+      dataBus.$on('get_input', (input) => {
+        this.input = input;
+      });
     }
   }
 </script>

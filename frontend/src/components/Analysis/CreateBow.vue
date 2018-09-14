@@ -23,6 +23,7 @@
 
 
   export default {
+    name: 'create_bow',
     data() {
       return {
         input: '',

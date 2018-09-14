@@ -23,6 +23,7 @@
   import axios from 'axios'
 
   export default {
+    name: 'scrape',
     data() {
       return {
         scrapingOutput: '',
@@ -69,7 +70,17 @@
           .catch(error => {
             console.log(error);
           })
+      },
+      killThreads() {
+        let id = window.setTimeout(function() {}, 0);
+        console.log(id)
+        while (id--) {
+          clearInterval(id);
+        }
       }
+    },
+    created() {
+      this.killThreads()
     }
   }
 </script>

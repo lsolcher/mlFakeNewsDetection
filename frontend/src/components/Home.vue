@@ -10,8 +10,8 @@
             label="Artikel-link, Tweet-link oder Tweet-id einfügen..."
             placeholder="https://twitter.com/i/web/status/1038073678058139648"
             id="userinput"
-            @keyup.enter="getDNNAnalysisResult()"
             v-model="input"
+            @input="updateInput()"
           ></v-text-field>
         </v-flex>
         <br>
@@ -25,11 +25,11 @@
 </template>
 
 <script>
-  import axios from 'axios'
   import DNN from './Analysis/DNN'
   import CreateBow from './Analysis/CreateBow'
   import GetBowResult from './Analysis/GetBowResult'
   import Scrape from './Analysis/Scrape'
+  import { dataBus } from "../main";
 
   export default {
     components: {
@@ -38,21 +38,16 @@
       'get_bow': GetBowResult,
       'scrape': Scrape
     },
+    props: ['input'],
     data() {
       return {
       }
     },
     methods: {
-      killThreads() {
-        let id = window.setTimeout(function() {}, 0);
-        console.log(id)
-        while (id--) {
-          clearInterval(id);
-        }
+      updateInput() {
+        console.log(this.input);
+        dataBus.$emit('get_input', this.input)
       }
-    },
-    created() {
-      this.killThreads()
     }
   }
 </script>

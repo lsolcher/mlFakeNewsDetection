@@ -20,12 +20,16 @@
 
 <script>
   import axios from 'axios'
+  import { dataBus } from "../../main";
+
 
   export default {
+    name: 'get_bow',
     data() {
       return {
         getBowOutput: '',
         getBowDone: true,
+        input: ''
       }
     },
     methods: {
@@ -51,7 +55,22 @@
             console.log(error);
             this.getBowDone = true
           })
+      },
+      killThreads() {
+        let id = window.setTimeout(function() {}, 0);
+        console.log(id)
+        while (id--) {
+          clearInterval(id);
+        }
       }
+    },
+    created() {
+      this.killThreads()
+    },
+    mounted() {
+      dataBus.$on('get_input', (input) => {
+        this.input = input;
+      });
     }
   }
 </script>
