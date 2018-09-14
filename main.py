@@ -30,10 +30,19 @@ def analyzeDNN():
     return jsonify(response)
 
 
-@app.route('/api/analyzeBOW')
-def analyzeBOW():
-    user_input = request.args.get('input')
+@app.route('/api/createBOW')
+def createBow():
     result = bow.create_bow_model()
+    response = {
+        'result': result
+    }
+    return jsonify(response)
+
+
+@app.route('/api/getBOW')
+def getBOW():
+    user_input = request.args.get('input')
+    result = bow.analyse_bow(user_input)
     response = {
         'result': result
     }
