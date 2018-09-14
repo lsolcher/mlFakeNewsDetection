@@ -4,7 +4,7 @@ from backend.dnnAnalysis import analyzer
 from backend.scraping import scraper
 from backend.bowAnalysis import bow
 from backend import constants
-import requests
+import requests, json
 import pickle
 
 
@@ -41,11 +41,16 @@ def createBow():
 
 @app.route('/api/getBOW')
 def getBOW():
+    """
+
+    :return: json array
+    """
     user_input = request.args.get('input')
     print(user_input)
     result = bow.get_bow_result(user_input)
     response = {
-        'result': result
+        'url': [i[0] for i in result],
+        'value': [i[1] for i in result]
     }
     return jsonify(response)
 

@@ -40,8 +40,8 @@ def get_bow_result(input_url):
     print('calculating similarities...')
     similarities = {}
     for i, c in counts.items():
-        #if i != input_url:
-        similarities[i] = counter_cosine_similarity(counts[i], counts[input_url])
+        if i != input_url:
+            similarities[i] = counter_cosine_similarity(counts[i], counts[input_url])
 
     sorted_sims = sorted(similarities.items(), key=operator.itemgetter(1), reverse=True)
     end = time.time()

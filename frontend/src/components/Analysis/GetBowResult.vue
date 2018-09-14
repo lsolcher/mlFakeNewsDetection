@@ -13,7 +13,10 @@
         @click="getBOWAnalysisResult()"
         :disabled="input === ''"
       >Link auf Wortähnlichkeit untersuchen</v-btn>
-      <p>{{getBowOutput}}</p>
+      <ul>
+        <p v-for="(item, index) in bowOutput.url"> {{bowOutput.url[index]}} : {{bowOutput.value[index]}}</p>
+      </ul>
+
     </template>
   </div>
 </template>
@@ -27,7 +30,7 @@
     name: 'get_bow',
     data() {
       return {
-        getBowOutput: '',
+        bowOutput: '',
         getBowDone: true,
         input: ''
       }
@@ -37,7 +40,7 @@
       getBOWAnalysisResult() {
         this.getBowDone = false;
         console.log(this.input);
-        this.getBowOutput = this.getBOWResultFromBackend()
+        this.bowOutput = this.getBOWResultFromBackend()
       },
       getBOWResultFromBackend() {
         const path = 'http://localhost:5000/api/getBOW';
@@ -47,8 +50,9 @@
           }
         })
           .then(response => {
-            this.getBowOutput = response.data.result;
-            console.log(this.getBowOutput);
+            this.bowOutput = response.data;
+            console.log(this.bowOutput);
+            console.log(typeof this.bowOutput);
             this.getBowDone = true;
           })
           .catch(error => {
@@ -58,7 +62,7 @@
       },
       killThreads() {
         let id = window.setTimeout(function() {}, 0);
-        console.log(id)
+        console.log(id);
         while (id--) {
           clearInterval(id);
         }
