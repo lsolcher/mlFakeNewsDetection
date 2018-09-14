@@ -14,3 +14,9 @@ BOW_FOLDER = os.path.join(DATAFOLDER,'bow/')
 PROGRESSFILE = DATAFOLDER + '//progress.p' # scraper
 PROGRESSFILE_BOW = BOW_FOLDER + '//progress.p'
 
+
+asecret = 'Vy5hWwthlxuU6qSVoq91Bb4TjfJo9sHSrmx66BN04zoTX'
+MIN_ARTICLE_LENGTH = 100
+MIN_SENTENCE_LENGTH = 10
+KEYWORDS_TO_TRACK = ['Hitler-Puppe', 'European Press Watch', 'altparteien', 'asyltourismus', 'zurücktreten', 'flüchtlinge', 'speigel', 'islamisierung'
+                     'geheimvertrag', 'skandal', 'rücktritt', 'skandal', 'aufgedeckt', 'gudenus', 'merkel', 'gabriel', 'brexit', 'qanon', 'chemnitz', 'politik', 'bundesregierung', 'berliner express', 'krah', 'köthen', 'koethen']

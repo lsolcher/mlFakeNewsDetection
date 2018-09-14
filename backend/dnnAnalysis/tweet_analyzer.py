@@ -14,13 +14,12 @@ from backend import constants
 ckey = 'rGxOFKgKRoGo1Kpl1FEqjNGlI'
 csecret = 'nnk4mqbRdOQQsCy8rIwCAxHnFUO6iGgjkpSsM96bGSZcANg7mR'
 atoken = '912478974-s9PU6WjEeZC0olc57moslUByXX7UeXxttrPH7YbK'
+
+
 asecret = 'Vy5hWwthlxuU6qSVoq91Bb4TjfJo9sHSrmx66BN04zoTX'
-MIN_ARTICLE_LENGTH = 100
-MIN_SENTENCE_LENGTH = 10
-KEYWORDS_TO_TRACK = ['Hitler-Puppe', 'European Press Watch', 'altparteien', 'asyltourismus', 'zurücktreten', 'flüchtlinge', 'speigel', 'islamisierung'
-                     'geheimvertrag', 'skandal', 'rücktritt', 'skandal', 'aufgedeckt', 'gudenus', 'merkel', 'gabriel', 'brexit', 'qanon', 'chemnitz', 'politik', 'bundesregierung', 'berliner express', 'krah', 'köthen', 'koethen']
-
-
+MIN_ARTICLE_LENGTH = constants.MIN_ARTICLE_LENGTH
+MIN_SENTENCE_LENGTH = constants.MIN_SENTENCE_LENGTH
+KEYWORDS_TO_TRACK = constants.KEYWORDS_TO_TRACK
 def get_tweet_by_id(tweet_id):
     auth = tweepy.OAuthHandler(ckey, csecret)
     auth.set_access_token(atoken, asecret)
@@ -231,15 +230,17 @@ def is_article(url, check_for_duplicates=True):
                     print('{} already in list'.format(url))
                     return '', '', False
 
-        # check url
-        if not url.endswith('/'):
-            url += '/'
-        if 'twitter.com' in url or "wikipedia" in url or 'youtube' in url or 'change.org' in url or 'amazon' in url \
-                or url.count('/') < 4:
+        # check url for duplicates, not-article-pages etc
+        checkurl = url
+        if not checkurl.endswith('/'):
+            checkurl += '/'
+        if 'twitter.com' in url or "wikipedia" in url or 'youtube' in url or 'change.org' in url or 'amazon' in checkurl \
+                or checkurl.count('/') < 4:
             # we don't want another tweet or wiki entry, we want articles
             # if \ less than three we probably have a home dir
             print('{} seems not to be an article page'.format(url))
             return '', '', False
+
 
         req = Request(url, headers={'User-Agent': "Magic Browser"})  # to prevent 403 - forbidden
         #req = req.rstrip('\\')
@@ -248,13 +249,15 @@ def is_article(url, check_for_duplicates=True):
         # get text
         all_text, all_hidden_text = text_from_html(page)
 
+
         # make sure we get no duplicates because of url with different strings after ? referncing to the same page
-        if '?' in url:
-            url_string = url.split('?')[0]
+        if '?' in checkurl:
+            url_string = checkurl.split('?')[0]
             rows = df.loc[df['article_url'].str.contains(url_string)]
             if all_text in rows.article_text:  # ie we already found this article
-                print('{} already in list'.format(url))
+                print('{} already in list'.format(checkurl))
                 return '', '', False
+
 
         # check language
         if all_text is None:  # if there is no text, it's obviously no article

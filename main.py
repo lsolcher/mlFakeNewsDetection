@@ -42,6 +42,7 @@ def createBow():
 @app.route('/api/getBOW')
 def getBOW():
     user_input = request.args.get('input')
+    print(user_input)
     result = bow.analyse_bow(user_input)
     response = {
         'result': result

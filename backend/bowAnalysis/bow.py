@@ -12,6 +12,10 @@ def create_bow_model():
 
 
 def analyse_bow(input_url):
+    success, article_text = utils.process_article(input_url)
+    print(success)
+    print(article_text)
+    return article_text
     counts = utils.load_obj(BOW_FOLDER, 'counts', test_string)
     word_list = utils.load_obj(BOW_FOLDER, 'word_list', test_string)
     tokens = utils.load_obj(BOW_FOLDER, 'tokens', test_string)
