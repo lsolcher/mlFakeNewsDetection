@@ -59,7 +59,6 @@ def getBOW():
     :return: json array
     """
     user_input = request.args.get('input')
-    print(user_input)
     result = bow.get_bow_result(user_input)
     response = {
         'url': ['<a href=\"' + i[0] + '\">' + i[0] + '</a>' for i in result],
@@ -100,13 +99,15 @@ def getCompleteResult():
     """
     user_input = request.args.get('input')
     print(user_input)
-    result = analyse.get_complete_result(input)
+    result, result_bow = analyse.get_complete_result(user_input)
+    print('RESULTDNN: ' + str(result))
+    print('RESULTBOW: ' + str(result_bow))
     # TODO
     response = {
-        'url': ['<a href=\"' + i[0] + '\">' + i[0] + '</a>' for i in result],
-        'value': [i[1] for i in result]
+        #'url': ['<a href=\"' + i[0] + '\">' + i[0] + '</a>' for i in result],
+        #'value': [i[1] for i in result]
     }
-    return jsonify(response)
+    return jsonify(result)
 
 
 

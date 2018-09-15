@@ -2,7 +2,7 @@
   <div>
     <!-- GET BOW ANALYSIS -->
     <template v-if="!done">
-      <p>Analysiere Link...</p>
+      <p>Analysiere Link nach allen Methoden...</p>
       <v-progress-circular
         indeterminate
         color="primary"
@@ -27,7 +27,6 @@
 
 
   export default {
-    name: 'get_bow',
     data() {
       return {
         output: '',

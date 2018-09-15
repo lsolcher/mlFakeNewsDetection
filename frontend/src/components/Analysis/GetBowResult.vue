@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- GET BOW ANALYSIS -->
-    <template v-if="!getBowDone">
+    <template v-if="!done">
       <p>Analysiere Link...</p>
       <v-progress-circular
         indeterminate
@@ -10,11 +10,11 @@
     </template>
     <template v-else>
       <v-btn
-        @click="getBOWAnalysisResult()"
+        @click="getAnalysisResult()"
         :disabled="input === ''"
       >Link auf Wortähnlichkeit untersuchen</v-btn>
       <ul>
-        <p v-for="(item, index) in bowOutput.url"> <span v-html="bowOutput.url[index]"></span> : {{bowOutput.value[index]}}</p>
+        <p v-for="(item, index) in output.url"> <span v-html="output.url[index]"></span> : {{output.value[index]}}</p>
       </ul>
 
     </template>
@@ -37,12 +37,12 @@
     },
     methods: {
       // ---- GET BOW MODEL ---- //
-      getCompleteResult() {
-        this.getBowDone = false;
+      getAnalysisResult() {
+        this.done = false;
         console.log(this.input);
-        this.bowOutput = this.getCompleteResultFromBackend()
+        this.output = this.getAnalysisResultFromBackend()
       },
-      getCompleteResultFromBackend() {
+      getAnalysisResultFromBackend() {
         const path = 'http://localhost:5000/api/getBOW';
         axios.get(path, {
           params: {
@@ -50,14 +50,14 @@
           }
         })
           .then(response => {
-            this.bowOutput = response.data;
+            this.output = response.data;
             console.log(this.output);
             console.log(typeof this.output);
-            this.getBowDone = true;
+            this.done = true;
           })
           .catch(error => {
             console.log(error);
-            this.getBowDone = true
+            this.done = true
           })
       },
       killThreads() {

@@ -46,20 +46,16 @@ def get_tweet_by_url(tweet_url):
         return False, 'The entered tweet id does not exist.'
 
 
-def get_article_url(url, idx):
+def get_article_url(url):
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser', from_encoding=resp.info().get_param('charset'))
-    counter = 0
-    idx += 1  # because the first link is the tweet itself
     for link in soup.find_all('a', href=True):
         if '/t.co/' in link['href']:
-            print(link['href'])
-            if counter == idx:
-                r = requests.get(link['href'])
-                url = r.url
+            r = requests.get(link['href'])
+            url = r.url
+            print('THISURL: ' + url)
+            if '//twitter.com/' not in url:
                 return url
-            else:
-                counter += 1
     return None
 
 
@@ -114,8 +110,9 @@ def process_tweet(status):
                 for idx, url_input in enumerate(urls):
                     r = requests.get(url_input)
                     url = r.url  # twitter is redircecting - get the correct link
+                    print('URL_INPUT: ' + url)
                     if 'twitter.com/i/' in url:
-                        url = get_article_url(url, idx)
+                        url = get_article_url(url)
                     if url is not None:
                         all_text, all_hidden_text, article = is_article(url, check_for_duplicates=False)
 

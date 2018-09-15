@@ -69,6 +69,7 @@
         axios.get(path)
           .then(response => {
             this.scrapeProgress = response.data;
+            console.log(typeof this.scrapeProgress)
             console.log(this.scrapeProgress)
           })
           .catch(error => {

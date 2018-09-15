@@ -3,6 +3,7 @@ import pickle
 import tensorflow as tf
 import pandas as pd
 import collections
+from flask import jsonify
 
 def save_obj(obj, path, name):
     with open(path + name + '.pkl', 'wb') as f:
@@ -92,5 +93,8 @@ def get_df(predict_input):
         df = pd.read_csv(predict_input, sep='|')
     return df
 
-def jsonify(ndarray):
-    return ndarray.tolist()
+def jsonify(item):
+    if type(item) is np.ndarray:
+        return item.tolist()
+    else:
+        return item
