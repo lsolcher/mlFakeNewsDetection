@@ -12,9 +12,9 @@ def create_bow_model():
 
 
 
-def get_bow_result(input_url):
-    success, article_text = utils.process_article(input_url)
-    word_list, counts = preprocessor.add_article_to_word_model(input_url, article_text)
+def get_bow_result(input_str, process_url=True):
+    success, article_text = utils.process_article(input_str)
+    word_list, counts = preprocessor.add_article_to_word_model(input_str, article_text)
     if word_list is None or counts is None:
         return 'Ein unerwarteter Fehler beim Erstellen des BOW-Modells ist aufgetreten'
     prepare_result_file()
@@ -40,8 +40,8 @@ def get_bow_result(input_url):
     print('calculating similarities...')
     similarities = {}
     for i, c in counts.items():
-        if i != input_url:
-            similarities[i] = counter_cosine_similarity(counts[i], counts[input_url])
+        if i != input_str:
+            similarities[i] = counter_cosine_similarity(counts[i], counts[input_str])
 
     sorted_sims = sorted(similarities.items(), key=operator.itemgetter(1), reverse=True)
     end = time.time()

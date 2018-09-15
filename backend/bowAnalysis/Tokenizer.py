@@ -12,15 +12,16 @@ import csv
 ARTICLE_FOLDER = constants.ARTICLE_FOLDER
 
 
-def tokenize_from_dir_to_tokens_per_csv():
+def tokenize_from_dir_to_tokens_per_csv(old_urls=None):
     tokens = {}
     for file in os.listdir(ARTICLE_FOLDER):
         if file.endswith(".csv"):
             with open(os.path.join(ARTICLE_FOLDER, file), 'r', encoding='utf-8') as csvfile:
                 reader = csv.reader(csvfile, delimiter='|')
                 for row in reader:
-                    tokens[row[0]] = nltk.word_tokenize(row[1], language='german')
-
+                    if not already_tokenized(row[0], old_urls):
+                        tokens[row[0]] = nltk.word_tokenize(row[1], language='german')
+    print(len(tokens))
     return tokens
 
 def tokenize_article(url, article):
@@ -29,6 +30,19 @@ def tokenize_article(url, article):
     tokens[url] = nltk.word_tokenize(article, language='german')
     return tokens
 
+
+def already_tokenized(url_to_check, old_urls):
+    print('URL' + url_to_check)
+
+    if old_urls is None:
+        print('1')
+        return False
+    else:
+        if url_to_check in old_urls:
+            print('2')
+            return True
+    print('3')
+    return False
 
 # def tokenize_from_dir_to_tokens_per_document(dirpath):
 #     """

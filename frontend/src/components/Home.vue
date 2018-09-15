@@ -21,6 +21,15 @@
     <create_bow />
     <get_bow />
     <scrape />
+    <complete_analysis />
+    <vue-flip active-hover="true">
+      <div slot="front">
+        front
+      </div>
+      <div slot="back">
+        back
+      </div>
+    </vue-flip>
   </div>
 </template>
 
@@ -29,6 +38,7 @@
   import CreateBow from './Analysis/CreateBow'
   import GetBowResult from './Analysis/GetBowResult'
   import Scrape from './Analysis/Scrape'
+  import CompleteAnalysis from './Analysis/CompleteAnalysis'
   import { dataBus } from "../main";
 
   export default {
@@ -36,7 +46,8 @@
       'dnn': DNN,
       'create_bow':  CreateBow,
       'get_bow': GetBowResult,
-      'scrape': Scrape
+      'scrape': Scrape,
+      'complete_analysis': CompleteAnalysis
     },
     props: ['input'],
     data() {

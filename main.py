@@ -3,6 +3,7 @@ from flask_cors import CORS
 from backend.dnnAnalysis import analyzer
 from backend.scraping import scraper
 from backend.bowAnalysis import bow
+from backend.completeAnalysis import analyse
 from backend import constants
 import requests, json
 import pickle
@@ -14,6 +15,18 @@ app = Flask(__name__,
 # cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 app.debug = False
 CORS(app)
+
+
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    return 'Server shutting down...'
 
 @app.route('/')
 def index():
@@ -77,6 +90,24 @@ def scrape_progress():
         progress = pickle.load(fp)
         print(jsonify(progress))
     return jsonify(progress)
+
+
+@app.route('/api/getCompleteResult')
+def getCompleteResult():
+    """
+
+    :return: json array
+    """
+    user_input = request.args.get('input')
+    print(user_input)
+    result = analyse.get_complete_result(input)
+    # TODO
+    response = {
+        'url': ['<a href=\"' + i[0] + '\">' + i[0] + '</a>' for i in result],
+        'value': [i[1] for i in result]
+    }
+    return jsonify(response)
+
 
 
 @app.route('/', defaults={'path': ''})

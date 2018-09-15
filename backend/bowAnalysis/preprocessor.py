@@ -1,6 +1,6 @@
 import time, traceback
 from collections import Counter
-import os
+import os, csv
 from .. import constants
 from . import utils, Tokenizer, Normalizer, Tagger, Lemmatizer
 from .utils import update_progress
@@ -109,85 +109,89 @@ def create_word_models_from_database():
     :return:
     """
     try:
-        if os.path.isfile(BOW_FOLDER + '/counts' + test_string + '.pkl') and \
-            os.path.isfile(BOW_FOLDER + '/word_list' + test_string + '.pkl') and \
-            os.path.isfile(BOW_FOLDER + '/tokens' + test_string + '.pkl'):
-            # counts = utils.load_obj(BOW_FOLDER, 'counts', test_string)
-            # word_list = utils.load_obj(BOW_FOLDER, 'word_list', test_string)
-            # tokens = utils.load_obj(BOW_FOLDER, 'tokens', test_string)
-            return 'Objects already created'
-        else:
-            progress = []
-            start = time.time()
-            print('tokenizing...')
-            progress.append('Tokenisiere...')
-            update_progress(progress)
-            tokens = Tokenizer.tokenize_from_dir_to_tokens_per_csv()
-            end = time.time()
-            print('done! took ', end - start, ' seconds.')
-            progress.append('Artikel tokenisiert in {} Sekunden!\n'.format(end-start))
-            update_progress(progress)
+        old_urls = get_old_urls()
+        progress = []
+        start = time.time()
+        print('tokenizing...')
+        progress.append('Tokenisiere...')
+        update_progress(progress)
+        tokens = Tokenizer.tokenize_from_dir_to_tokens_per_csv(old_urls)
+        end = time.time()
+        print('done! took ', end - start, ' seconds.')
+        progress.append('Artikel tokenisiert in {} Sekunden!\n'.format(end-start))
+        update_progress(progress)
 
 
-            start = time.time()
-            print('tagging...')
-            progress.append('Tagge...')
-            update_progress(progress)
-            tokens = Tagger.tag(tokens)
-            end = time.time()
-            print('done! took ', end - start, ' seconds.')
-            progress.append('Artikel getaggt in {} Sekunden!\n'.format(end-start))
-            update_progress(progress)
+        start = time.time()
+        print('tagging...')
+        progress.append('Tagge...')
+        update_progress(progress)
+        tokens = Tagger.tag(tokens)
+        end = time.time()
+        print('done! took ', end - start, ' seconds.')
+        progress.append('Artikel getaggt in {} Sekunden!\n'.format(end-start))
+        update_progress(progress)
 
 
-            start = time.time()
-            print('normalizing...')
-            progress.append('Normalisiere...')
-            update_progress(progress)
-            tokens = Normalizer.normalize(tokens)
-            end = time.time()
-            print('done! took ', end - start, ' seconds.')
-            progress.append('Artikel normalisiert in {} Sekunden!\n'.format(end-start))
-            update_progress(progress)
+        start = time.time()
+        print('normalizing...')
+        progress.append('Normalisiere...')
+        update_progress(progress)
+        tokens = Normalizer.normalize(tokens)
+        end = time.time()
+        print('done! took ', end - start, ' seconds.')
+        progress.append('Artikel normalisiert in {} Sekunden!\n'.format(end-start))
+        update_progress(progress)
 
 
-            start = time.time()
-            print('lemmatizing...')
-            progress.append('Lemmatisiere...')
-            update_progress(progress)
-            tokens = Lemmatizer.lemmatize_tokens(tokens)
-            end = time.time()
-            print('done! took ', end - start, ' seconds.')
-            progress.append('Artikel lemmatisiert in {} Sekunden!\n'.format(end-start))
-            update_progress(progress)
+        start = time.time()
+        print('lemmatizing...')
+        progress.append('Lemmatisiere...')
+        update_progress(progress)
+        tokens = Lemmatizer.lemmatize_tokens(tokens)
+        end = time.time()
+        print('done! took ', end - start, ' seconds.')
+        progress.append('Artikel lemmatisiert in {} Sekunden!\n'.format(end-start))
+        update_progress(progress)
 
 
-            start = time.time()
-            print('counting...')
-            progress.append('Zähle...')
-            update_progress(progress)
-            word_list = {}
-            for idx, token in tokens.items():
-                word_list[idx] = ([t[0] for t in token])
-            counts = {}
-            for idx, item in word_list.items():
-                counts[idx] = Counter(item)
-            end = time.time()
-            print('done! took ', end - start, ' seconds.')
-            progress.append('Wörter gezählt in {} Sekunden!\n'.format(end-start))
-            update_progress(progress)
+        start = time.time()
+        print('counting...')
+        progress.append('Zähle...')
+        update_progress(progress)
+        word_list = {}
+        for idx, token in tokens.items():
+            word_list[idx] = ([t[0] for t in token])
+        counts = {}
+        for idx, item in word_list.items():
+            counts[idx] = Counter(item)
+        end = time.time()
+        print('done! took ', end - start, ' seconds.')
+        progress.append('Wörter gezählt in {} Sekunden!\n'.format(end-start))
+        update_progress(progress)
 
 
-            utils.save_obj(counts, BOW_FOLDER, 'counts', test_string)
-            utils.save_obj(word_list, BOW_FOLDER, 'word_list', test_string)
-            utils.save_obj(tokens, BOW_FOLDER, 'tokens', test_string)
-            progress.append('BOW-Modell erstellt!')
-            update_progress(progress)
-            return 'Successfully created word models from database'
+        utils.save_obj(counts, BOW_FOLDER, 'counts', test_string)
+        utils.save_obj(word_list, BOW_FOLDER, 'word_list', test_string)
+        utils.save_obj(tokens, BOW_FOLDER, 'tokens', test_string)
+        progress.append('BOW-Modell erstellt!')
+        update_progress(progress)
+        return 'Successfully created word models from database'
     except:
         traceback.print_exc()
         return 'An error occurred creating word models'
 
+
+def get_old_urls():
+    urls = set()
+    for r, d, f in os.walk(constants.ARTICLE_FOLDER):
+        for file in f:
+            if file.endswith('.csv'):
+                with open(os.path.join(r, file), 'r', encoding='utf-8', ) as read:
+                    reader = csv.reader(read, delimiter='|')
+                    for row in reader:
+                        urls.update(row[0])
+    return urls
 """
 def has_sub_folder(path_to_parent):
     if type(path_to_parent) == list:

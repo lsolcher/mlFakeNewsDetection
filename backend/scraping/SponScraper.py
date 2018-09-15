@@ -31,7 +31,7 @@ def scrape(progress):
     for page in PAGE:
         soup_mainpages.append(BeautifulSoup(page, 'html.parser'))
 
-    progress.append('Analysiere aktuelle Artikel von www.sueddeutsche.de')
+    progress.append('Analysiere aktuelle Artikel von www.spiegel.de')
     progress.append('Sammle Artikel...')
     # progress.progress_value = 0
     update_progress(progress)
@@ -52,8 +52,12 @@ def scrape(progress):
                         article_links.add('http://www.spiegel.de' + link['href'])
                         if len(article_links) % 100 == 0:
                             print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
-                            progress.append('Bisher wurden {} Artikel gefunden'.format(len(article_links)))
-                            update_progress(progress)
+                            prog_str = ('Bisher wurden {} Artikel von Spiegel Online gefunden'.format(len(article_links)))
+                            if prog_str not in progress:
+                                # because some article urls are found more than once and
+                                # won't be added twice but counting still thinks somethin new is added
+                                progress.append(prog_str)
+                                update_progress(progress)
 
             except TypeError:
                 traceback.print_exc()
@@ -96,7 +100,7 @@ def scrape(progress):
             all_text = all_text.replace('SPIEGEL+', '')
             all_text = all_text.replace('SPIEGEL', '')
             if all_text:
-                fields = [url,
+                fields = [url.rstrip('/'),
                           all_text]
                 result_article_file = RESULTPATH + '\\spon.csv'
                 Path(result_article_file).touch(exist_ok=True)
@@ -105,7 +109,8 @@ def scrape(progress):
                     writer.writerow(fields)
             if idx % 100 == 0:
                 print('Scraped {} of {} articles'.format(idx, len(new_links)))
-                progress.append('Schreibe Artikel... \n Bisher wurden {} von {} Artikel geschrieben.'.format\
+                progress.append('Schreibe Artikel...')
+                progress.append('Bisher wurden {} von {} Artikel geschrieben.'.format\
                     (idx, len(new_links)))
                 update_progress(progress)
         except Exception:

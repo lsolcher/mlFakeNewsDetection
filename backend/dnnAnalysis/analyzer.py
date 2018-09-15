@@ -1,4 +1,5 @@
-from . import dnn_keras, utils, tweet_analyzer
+from . import dnn_keras, utils
+from backend import tweet_analyzer
 
 
 def analyze_input(input_str):

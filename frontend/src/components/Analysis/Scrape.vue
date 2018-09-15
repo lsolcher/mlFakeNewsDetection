@@ -13,9 +13,11 @@
         <v-btn
           @click="scrape()"
         >Artikeldatenbank aktualisieren</v-btn>
-        <li v-for="msg in scrapeProgress">
-          {{ msg }}
-        </li>
+        <ul>
+          <p v-for="msg in scrapeProgress">
+            {{ msg }}
+          </p>
+        </ul>
       </template>
 
     </div>
@@ -60,7 +62,7 @@
       updateScrapeProgress() {
         this.scrapeProgressId = setInterval(function () {
           this.readScrapeProgress();
-        }.bind(this), 3000);
+        }.bind(this), 1000);
       },
       readScrapeProgress() {
         const path = 'http://localhost:5000/api/scrape_progress';

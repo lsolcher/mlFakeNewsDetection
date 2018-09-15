@@ -30,19 +30,19 @@
     name: 'get_bow',
     data() {
       return {
-        bowOutput: '',
-        getBowDone: true,
+        output: '',
+        done: true,
         input: ''
       }
     },
     methods: {
       // ---- GET BOW MODEL ---- //
-      getBOWAnalysisResult() {
+      getCompleteResult() {
         this.getBowDone = false;
         console.log(this.input);
-        this.bowOutput = this.getBOWResultFromBackend()
+        this.bowOutput = this.getCompleteResultFromBackend()
       },
-      getBOWResultFromBackend() {
+      getCompleteResultFromBackend() {
         const path = 'http://localhost:5000/api/getBOW';
         axios.get(path, {
           params: {
@@ -51,8 +51,8 @@
         })
           .then(response => {
             this.bowOutput = response.data;
-            console.log(this.bowOutput);
-            console.log(typeof this.bowOutput);
+            console.log(this.output);
+            console.log(typeof this.output);
             this.getBowDone = true;
           })
           .catch(error => {

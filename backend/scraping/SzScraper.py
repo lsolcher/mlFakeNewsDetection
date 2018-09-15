@@ -82,7 +82,7 @@ def scrape(progress):
     with open(result_url_file, 'a') as f:
         for item in new_links:
             f.write("%s\n" % item)
-    progress.append('{} neue Artikel seit dem letzten Scan gefunden. \n Schreibe Artikel in Datenbank...'.format(len(new_links)))
+    progress.append('{} neue Artikel seit dem letzten Scan gefunden. Schreibe Artikel in Datenbank...'.format(len(new_links)))
     update_progress(progress)
     # get article text and save it to file
     print(len(new_links))
@@ -97,7 +97,7 @@ def scrape(progress):
             all_text = re.sub(r'.*\(*\) - ', '', all_text) # remove city and agency tags
             if all_text:
                 if all_text:
-                    fields = [url,
+                    fields = [url.rstrip('/'),
                               all_text]
                     result_article_file = RESULTPATH + '\\sz.csv'
                     Path(result_article_file).touch(exist_ok=True)
@@ -106,7 +106,8 @@ def scrape(progress):
                         writer.writerow(fields)
             if idx % 100 == 0:
                 print('Scraped {} of {} articles'.format(idx, len(new_links)))
-                progress.append('Schreibe Artikel... \n Bisher wurden {} von {} Artikel geschrieben.'.format\
+                progress.append('Schreibe Artikel...')
+                progress.append('Bisher wurden {} von {} Artikel geschrieben.'.format\
                     (idx, len(new_links)))
                 update_progress(progress)
 

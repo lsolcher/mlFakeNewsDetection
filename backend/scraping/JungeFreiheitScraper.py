@@ -51,8 +51,7 @@ def scrape(progress):
                         article_links.add(link['href'])
                         if len(article_links) % 100 == 0:
                             print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
-
-                            prog_str = ('Bisher wurden {} Artikel gefunden'.format(len(article_links)))
+                            prog_str = ('Bisher wurden {} Artikel von Junge Freiheit gefunden'.format(len(article_links)))
                             if prog_str not in progress:
                                 # because some article urls are found more than once and
                                 # won't be added twice but counting still thinks somethin new is added
@@ -89,7 +88,8 @@ def scrape(progress):
         try:
             if idx % 100 == 0:
                 print('Wrote {} of {} articles.'.format(idx, len(new_links)))
-                progress.append('Schreibe Artikel... \n Bisher wurden {} von {} Artikel geschrieben.'.format\
+                progress.append('Schreibe Artikel...')
+                progress.append('Bisher wurden {} von {} Artikel geschrieben.'.format\
                     (idx, len(new_links)))
                 update_progress(progress)
             page = urlopen(url)
@@ -101,7 +101,7 @@ def scrape(progress):
                     text += ''.join(element.findAll(text=True))
             text = re.sub(r"\b[A-Z]+(?:\s+[A-Z]+)*\b. ", '', text)  # remove uppercased city
             if text:
-                fields = [url,
+                fields = [url.rstrip('/'),
                           text]
                 result_article_file = RESULTPATH + '\\jf.csv'
                 Path(result_article_file).touch(exist_ok=True)
