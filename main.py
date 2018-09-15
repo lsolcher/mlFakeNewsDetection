@@ -94,20 +94,20 @@ def scrape_progress():
 @app.route('/api/getCompleteResult')
 def getCompleteResult():
     """
-
     :return: json array
     """
     user_input = request.args.get('input')
     print(user_input)
-    result, result_bow = analyse.get_complete_result(user_input)
-    print('RESULTDNN: ' + str(result))
+    dnn_result, result_bow = analyse.get_complete_result(user_input)
+    print('RESULTDNN: ' + str(dnn_result))
     print('RESULTBOW: ' + str(result_bow))
-    # TODO
+    #TODO
     response = {
-        #'url': ['<a href=\"' + i[0] + '\">' + i[0] + '</a>' for i in result],
-        #'value': [i[1] for i in result]
+        'bow_url': ['<a href=\"' + i[0] + '\">' + i[0] + '</a>' for i in result_bow],
+        'bow_value': [i[1] for i in result_bow],
+        'dnn_result': dnn_result
     }
-    return jsonify(result)
+    return jsonify(response)
 
 
 

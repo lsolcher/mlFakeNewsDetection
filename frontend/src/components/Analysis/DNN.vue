@@ -45,7 +45,7 @@
           }
         })
           .then(response => {
-            this.dnnAnalysisOutput = response.data.result;
+            this.dnnAnalysisOutput = response.data;
             console.log(this.dnnAnalysisOutput);
             this.dnnAnalysisDone = true
           })

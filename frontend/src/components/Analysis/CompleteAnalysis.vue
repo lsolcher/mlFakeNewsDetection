@@ -14,7 +14,8 @@
         :disabled="input === ''"
       >Link nach allen Methoden untersuchen</v-btn>
       <ul>
-        <p v-for="(item, index) in output.url"> <span v-html="output.url[index]"></span> : {{output.value[index]}}</p>
+        <p>{{output.dnn_result}}</p>
+        <p v-for="(item, index) in output.bow_url"> <span v-html="output.bow_url[index]"></span> : {{output.bow_value[index]}}</p>
       </ul>
 
     </template>
