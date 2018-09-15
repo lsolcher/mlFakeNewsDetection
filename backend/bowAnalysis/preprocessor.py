@@ -185,11 +185,14 @@ def create_word_models_from_database():
 
 
 def get_old_urls():
-    urls = set()
+    urls = []
     for file in os.listdir(BOW_FOLDER):
         if file.endswith(".txt") and '_urls' in file:
             with open(os.path.join(BOW_FOLDER, file), 'r', encoding='utf-8') as f:
-                urls.add(f.read())
+                for line in f:
+                    line = line.strip()  # or some other preprocessing
+                    urls.append(line)  # storing everything in memory!
+
     print(urls)
     return urls
 """

@@ -8,8 +8,8 @@ test_string = ''
 
 def create_bow_model():
     prepare_progress_file()
-    utils.save_used_urls()
     result = preprocessor.create_word_models_from_database()
+    utils.save_used_urls()
     return result
 
 

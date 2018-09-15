@@ -27,15 +27,11 @@ def tokenize_from_dir_to_tokens_per_csv(old_urls=None):
 
 def tokenize_article(url, article):
     tokens = {}
-    print(article)
     tokens[url] = nltk.word_tokenize(article, language='german')
     return tokens
 
 
 def already_tokenized(url_to_check, old_urls):
-    print('URL: ' + url_to_check)
-    print(next(iter(old_urls)))
-    time.sleep(3)
     if old_urls is None:
         return False
     else:

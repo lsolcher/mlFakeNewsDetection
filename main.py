@@ -43,11 +43,12 @@ def activate_job():
         while True:
             now = datetime.datetime.now()
             print(now.hour)
-            if now.hour == 23:
+            if now.hour == 23 and now.minute == 59:
                 scrape()
                 createBow()
+                print('updated models')
             print("Run recurring task")
-            time.sleep(60)
+            time.sleep(59)
 
     thread = threading.Thread(target=run_job)
     thread.start()
