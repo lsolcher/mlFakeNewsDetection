@@ -5,8 +5,27 @@ from backend.scraping import scraper
 from backend.bowAnalysis import bow
 from backend.completeAnalysis import analyse
 from backend import constants
-import requests, json
+import requests, time, threading, datetime
 import pickle
+
+def start_runner():
+    def start_loop():
+        not_started = True
+        while not_started:
+            print('In start loop')
+            try:
+                r = requests.get('http://127.0.0.1:5000/')
+                if r.status_code == 200:
+                    print('Server started, quiting start_loop')
+                    not_started = False
+                print(r.status_code)
+            except:
+                print('Server not yet started')
+            time.sleep(2)
+
+    print('Started runner')
+    thread = threading.Thread(target=start_loop)
+    thread.start()
 
 
 app = Flask(__name__,
@@ -15,6 +34,23 @@ app = Flask(__name__,
 # cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 app.debug = False
 CORS(app)
+start_runner()
+
+
+@app.before_first_request
+def activate_job():
+    def run_job():
+        while True:
+            now = datetime.datetime.now()
+            print(now.hour)
+            if now.hour == 23:
+                scrape()
+                createBow()
+            print("Run recurring task")
+            time.sleep(60)
+
+    thread = threading.Thread(target=run_job)
+    thread.start()
 
 
 def shutdown_server():
@@ -78,6 +114,7 @@ def bow_progress():
 @app.route('/api/scrape')
 def scrape():
     result = scraper.scrape()
+    print('DONE')
     response = {
         'result': result
     }
@@ -87,7 +124,6 @@ def scrape():
 def scrape_progress():
     with open(constants.PROGRESSFILE_SCRAPER, 'rb') as fp:
         progress = pickle.load(fp)
-        print(jsonify(progress))
     return jsonify(progress)
 
 

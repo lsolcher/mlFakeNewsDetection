@@ -104,6 +104,7 @@ def scrape(progress):
                           all_text]
                 result_article_file = RESULTPATH + '\\spon.csv'
                 Path(result_article_file).touch(exist_ok=True)
+                all_text = all_text.encode('utf-16', 'surrogatepass').decode('utf-16') # to prevent surrogates not allowed error
                 with open(result_article_file, 'a+', encoding='utf-8', newline='') as f:
                     writer = csv.writer(f, delimiter='|')
                     writer.writerow(fields)

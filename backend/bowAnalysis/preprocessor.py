@@ -109,12 +109,15 @@ def create_word_models_from_database():
     :return:
     """
     try:
-        old_urls = get_old_urls()
+        # old_urls = get_old_urls()
         progress = []
         start = time.time()
         print('tokenizing...')
         progress.append('Tokenisiere...')
         update_progress(progress)
+
+        old_urls = get_old_urls()
+
         tokens = Tokenizer.tokenize_from_dir_to_tokens_per_csv(old_urls)
         end = time.time()
         print('done! took ', end - start, ' seconds.')
@@ -170,7 +173,6 @@ def create_word_models_from_database():
         progress.append('Wörter gezählt in {} Sekunden!\n'.format(end-start))
         update_progress(progress)
 
-
         utils.save_obj(counts, BOW_FOLDER, 'counts', test_string)
         utils.save_obj(word_list, BOW_FOLDER, 'word_list', test_string)
         utils.save_obj(tokens, BOW_FOLDER, 'tokens', test_string)
@@ -184,13 +186,11 @@ def create_word_models_from_database():
 
 def get_old_urls():
     urls = set()
-    for r, d, f in os.walk(constants.ARTICLE_FOLDER):
-        for file in f:
-            if file.endswith('.csv'):
-                with open(os.path.join(r, file), 'r', encoding='utf-8', ) as read:
-                    reader = csv.reader(read, delimiter='|')
-                    for row in reader:
-                        urls.update(row[0])
+    for file in os.listdir(BOW_FOLDER):
+        if file.endswith(".txt") and '_urls' in file:
+            with open(os.path.join(BOW_FOLDER, file), 'r', encoding='utf-8') as f:
+                urls.add(f.read())
+    print(urls)
     return urls
 """
 def has_sub_folder(path_to_parent):

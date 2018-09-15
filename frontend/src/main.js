@@ -6,8 +6,9 @@ import router from './router'
 
 Vue.config.productionTip = false
 
-Vue.use(Vuetify);
 Vue.use(VueFlip);
+Vue.use(Vuetify);
+
 
 export const dataBus = new Vue();
 

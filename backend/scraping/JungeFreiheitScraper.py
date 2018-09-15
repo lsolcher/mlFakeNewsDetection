@@ -77,7 +77,7 @@ def scrape(progress):
     print('Found {} new items since last scan'.format(len(new_links)))
     with open(result_url_file, 'a') as f:
         for item in new_links:
-            f.write("%s\n" % item)
+            f.write("%s\n" % item.rstrip('/'))
     progress.append('{} neue Artikel seit dem letzten Scan gefunden. \n Schreibe Artikel in Datenbank...'.format(len(new_links)))
     update_progress(progress)
 

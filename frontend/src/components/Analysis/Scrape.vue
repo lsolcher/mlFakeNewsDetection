@@ -13,8 +13,8 @@
         <v-btn
           @click="scrape()"
         >Artikeldatenbank aktualisieren</v-btn>
-        <ul>
-          <p v-for="msg in scrapeProgress">
+        <ul v-for="msg in scrapeProgress">
+          <p>
             {{ msg }}
           </p>
         </ul>
@@ -68,8 +68,9 @@
         const path = 'http://localhost:5000/api/scrape_progress';
         axios.get(path)
           .then(response => {
-            this.scrapeProgress = response.data;
+            this.scrapeProgress = Array.from(response.data);
             console.log(typeof this.scrapeProgress)
+            console.log(Array.isArray(this.scrapeProgress))
             console.log(this.scrapeProgress)
           })
           .catch(error => {

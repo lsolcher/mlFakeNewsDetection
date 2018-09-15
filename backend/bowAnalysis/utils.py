@@ -4,6 +4,8 @@ from .. import constants
 from urllib.request import urlopen, HTTPError, Request
 from langdetect import detect, lang_detect_exception
 import string, re, datetime
+from shutil import copyfile
+import os
 
 MIN_ARTICLE_LENGTH = constants.MIN_ARTICLE_LENGTH
 MIN_SENTENCE_LENGTH = constants.MIN_SENTENCE_LENGTH
@@ -205,4 +207,10 @@ def xstr(s):
         return ''
     else:
         return str(s)
+
+
+def save_used_urls():
+    for file in os.listdir(constants.ARTICLE_FOLDER):
+        if file.endswith(".txt") and '_urls' in file:
+            copyfile(os.path.join(constants.ARTICLE_FOLDER, file), os.path.join(constants.BOW_FOLDER, file))
 

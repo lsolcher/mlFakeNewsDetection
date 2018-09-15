@@ -1,12 +1,14 @@
 from .. import constants
 from . import preprocessor, utils
-import time, math, operator, csv
+import time, math, operator, csv, os
 from pathlib import Path
 
 BOW_FOLDER = constants.BOW_FOLDER
 test_string = ''
 
 def create_bow_model():
+    prepare_progress_file()
+    utils.save_used_urls()
     result = preprocessor.create_word_models_from_database()
     return result
 
@@ -65,4 +67,12 @@ def counter_cosine_similarity(c1, c2):
 def prepare_result_file():
     Path(constants.RESULTFILE_BOW).touch(exist_ok=True)
     with open(constants.RESULTFILE_BOW, "w"):
+        pass
+
+
+def prepare_progress_file():
+    if not os.path.exists(constants.BOW_FOLDER):
+        os.makedirs(constants.BOW_FOLDER)
+    Path(constants.PROGRESSFILE_BOW).touch(exist_ok=True)
+    with open(constants.PROGRESSFILE_BOW, "w"):
         pass

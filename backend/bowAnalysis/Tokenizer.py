@@ -8,6 +8,7 @@ from .. import constants
 import nltk
 import os.path
 import csv
+import time
 
 ARTICLE_FOLDER = constants.ARTICLE_FOLDER
 
@@ -21,7 +22,7 @@ def tokenize_from_dir_to_tokens_per_csv(old_urls=None):
                 for row in reader:
                     if not already_tokenized(row[0], old_urls):
                         tokens[row[0]] = nltk.word_tokenize(row[1], language='german')
-    print(len(tokens))
+    print('NEW TOKENS: ' +  str(len(tokens)))
     return tokens
 
 def tokenize_article(url, article):
@@ -32,16 +33,14 @@ def tokenize_article(url, article):
 
 
 def already_tokenized(url_to_check, old_urls):
-    print('URL' + url_to_check)
-
+    print('URL: ' + url_to_check)
+    print(next(iter(old_urls)))
+    time.sleep(3)
     if old_urls is None:
-        print('1')
         return False
     else:
         if url_to_check in old_urls:
-            print('2')
             return True
-    print('3')
     return False
 
 # def tokenize_from_dir_to_tokens_per_document(dirpath):
