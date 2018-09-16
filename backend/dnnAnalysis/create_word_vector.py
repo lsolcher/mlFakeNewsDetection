@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from gensim.models.word2vec import Word2Vec
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel
+from spacy.lang.de import German
 import gensim
 import os
 from . import utils
@@ -133,7 +134,7 @@ def prepare_twitter_data(data_file, type_of_analysis):
 
 
     #  TOPIC MODELLING
-    nlp = spacy.load("de")
+    nlp = German()
     stop_words = get_stop_words('de')
     stop_words.append('foto')
     stop_words.append('⬅')
@@ -225,7 +226,7 @@ def do_create(train, test):
 
     # preprocessing
     print('removing stop words')
-    nlp = spacy.load('de')
+    nlp = German() # spacy.load('de')
     stop_words = get_stop_words('de')
     stop_words.append('foto')
     stop_words.append('picture')
@@ -318,7 +319,7 @@ def do_create(train, test):
 def do_create_twitter(train, test):
     # preprocessing
     print('removing stop words')
-    nlp = spacy.load('de')
+    nlp = German() # spacy.load('de')
     stop_words = get_stop_words('de')
     stop_words.append('foto')
     stop_words.append('picture')
@@ -392,7 +393,7 @@ def pack_data_to_predict(predict_file, wordvec_model_article, wordvec_model_twee
     # preprocessing
     print(df)
     print('removing stop words')
-    nlp = spacy.load('de')
+    nlp = German() # spacy.load('de')
     stop_words = get_stop_words('de')
     stop_words.append('foto')
     stop_words.append('picture')
