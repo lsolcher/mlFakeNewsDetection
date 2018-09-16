@@ -21,3 +21,5 @@ MIN_ARTICLE_LENGTH = 100
 MIN_SENTENCE_LENGTH = 10
 KEYWORDS_TO_TRACK = ['Hitler-Puppe', 'European Press Watch', 'altparteien', 'asyltourismus', 'zurücktreten', 'flüchtlinge', 'speigel', 'islamisierung'
                      'geheimvertrag', 'skandal', 'rücktritt', 'skandal', 'aufgedeckt', 'gudenus', 'merkel', 'gabriel', 'brexit', 'qanon', 'chemnitz', 'politik', 'bundesregierung', 'berliner express', 'krah', 'köthen', 'koethen']
+
+MAX_PAGES_TO_SCRAPE = 2

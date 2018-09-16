@@ -1,21 +1,26 @@
 <template>
   <div>
     <!-- GET BOW ANALYSIS -->
+
+    <!-- currently analysing -->
     <template v-if="!done">
       <p>Analysiere Link...</p>
       <v-progress-circular
         indeterminate
         color="primary"
       ></v-progress-circular>
+      <ul>
+        <p v-for="(item, index) in output.url"> <span v-html="output.url[index]"></span> : {{output.value[index]}}</p>
+      </ul>
     </template>
+
+
+
     <template v-else>
       <v-btn
         @click="getAnalysisResult()"
         :disabled="input === ''"
       >Link auf Wortähnlichkeit untersuchen</v-btn>
-      <ul>
-        <p v-for="(item, index) in output.url"> <span v-html="output.url[index]"></span> : {{output.value[index]}}</p>
-      </ul>
 
     </template>
   </div>

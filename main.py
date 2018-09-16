@@ -5,7 +5,7 @@ from backend.scraping import scraper
 from backend.bowAnalysis import bow
 from backend.completeAnalysis import analyse
 from backend import constants
-import requests, time, threading, datetime
+import requests, time, threading, datetime, os
 import pickle
 
 def start_runner():
@@ -42,13 +42,13 @@ def activate_job():
     def run_job():
         while True:
             now = datetime.datetime.now()
-            print(now.hour)
-            if now.hour == 23 and now.minute == 59:
+            print(now.minute)
+            if now.minute == 38:
                 scrape()
                 createBow()
                 print('updated models')
             print("Run recurring task")
-            time.sleep(59)
+            time.sleep(60)
 
     thread = threading.Thread(target=run_job)
     thread.start()
@@ -123,8 +123,10 @@ def scrape():
 
 @app.route('/api/scrape_progress')
 def scrape_progress():
-    with open(constants.PROGRESSFILE_SCRAPER, 'rb') as fp:
-        progress = pickle.load(fp)
+    progress = ''
+    if os.path.getsize(constants.PROGRESSFILE_SCRAPER) > 0:
+        with open(constants.PROGRESSFILE_SCRAPER, 'rb') as fp:
+            progress = pickle.load(fp)
     return jsonify(progress)
 
 

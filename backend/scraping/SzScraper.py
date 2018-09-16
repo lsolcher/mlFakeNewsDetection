@@ -26,7 +26,7 @@ def scrape(progress):
     for url in URL:
         PAGE.append(None)
 
-    max_pages = 10
+    max_pages = constants.MAX_PAGES_TO_SCRAPE
     progress.append('Analysiere aktuelle Artikel von www.sueddeutsche.de')
     progress.append('Sammle Artikel...')
     # progress.progress_value = 0
@@ -79,7 +79,7 @@ def scrape(progress):
     article_links = set(article_links)  # eliminate duplicate entries
     new_links = article_links - old_links # get only new - not already saved urls
     print('Found {} new items since last scan'.format(len(new_links)))
-    with open(result_url_file, 'a') as f:
+    with open(result_url_file, 'a+') as f:
         for item in new_links:
             f.write("%s\n" % item)
     progress.append('{} neue Artikel seit dem letzten Scan gefunden. Schreibe Artikel in Datenbank...'.format(len(new_links)))

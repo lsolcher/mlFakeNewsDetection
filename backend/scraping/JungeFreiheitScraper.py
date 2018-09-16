@@ -39,7 +39,7 @@ def scrape(progress):
     # get all article URLs
     article_links = set()
     for i, category in enumerate(soup_mainpages):
-        for iteration in range(0, 100):
+        for iteration in range(0, constants.MAX_PAGES_TO_SCRAPE * 5):
             try:
                 if iteration > 0:
                     nextUrlTag = category.find('a', href=True, text=re.compile('Nächste Seite'))
@@ -48,7 +48,7 @@ def scrape(progress):
                     category = BeautifulSoup(PAGE[i], 'html.parser')
                 for link in category.findAll('a', attrs={'href': re.compile("^https://jungefreiheit.de/.*")}):
                     if link['href'] and '2018' in link['href'] and '/#comments' not in link['href']:  # eliminate non-articles
-                        article_links.add(link['href'])
+                        article_links.add(link['href'].rstrip('/'))
                         if len(article_links) % 100 == 0:
                             print('Fetching articles. Found {} unique articles so far.'.format(len(article_links)))
                             prog_str = ('Bisher wurden {} Artikel von Junge Freiheit gefunden'.format(len(article_links)))
@@ -75,7 +75,7 @@ def scrape(progress):
     article_links = set(article_links)  # eliminate duplicate entries
     new_links = article_links - old_links # get only new - not already saved urls
     print('Found {} new items since last scan'.format(len(new_links)))
-    with open(result_url_file, 'a') as f:
+    with open(result_url_file, 'a+') as f:
         for item in new_links:
             f.write("%s\n" % item.rstrip('/'))
     progress.append('{} neue Artikel seit dem letzten Scan gefunden. \n Schreibe Artikel in Datenbank...'.format(len(new_links)))

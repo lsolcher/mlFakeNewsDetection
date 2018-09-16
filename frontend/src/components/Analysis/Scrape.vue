@@ -1,23 +1,27 @@
 <template>
     <div>
       <!-- SCRAPING -->
+
+      <!-- currently scraping -->
       <template v-if="!scrapingDone">
         <p>Aktualisiere Datenbank...</p>
-        <p>{{scrapeProgress}}</p>
         <v-progress-circular
           indeterminate
           color="primary"
         ></v-progress-circular>
-      </template>
-      <template v-else>
-        <v-btn
-          @click="scrape()"
-        >Artikeldatenbank aktualisieren</v-btn>
         <ul v-for="msg in scrapeProgress">
           <p>
             {{ msg }}
           </p>
         </ul>
+      </template>
+
+
+
+      <template v-else>
+        <v-btn
+          @click="scrape()"
+        >Artikeldatenbank aktualisieren</v-btn>
       </template>
 
     </div>
@@ -70,8 +74,6 @@
           .then(response => {
             this.scrapeProgress = Array.from(response.data);
             console.log(typeof this.scrapeProgress)
-            console.log(Array.isArray(this.scrapeProgress))
-            console.log(this.scrapeProgress)
           })
           .catch(error => {
             console.log(error);

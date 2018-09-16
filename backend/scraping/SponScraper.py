@@ -39,7 +39,7 @@ def scrape(progress):
     # get all article URLs
     article_links = set()
     for i, category in enumerate(soup_mainpages):
-        for iteration in range(0, 10):
+        for iteration in range(0, constants.MAX_PAGES_TO_SCRAPE):
             try:
                 if iteration > 0:
                     nextUrlTag = category.find('a', href=True, text='Mehr Artikel')
@@ -77,7 +77,7 @@ def scrape(progress):
     article_links = set(article_links)  # eliminate duplicate entries
     new_links = article_links - old_links # get only new - not already saved urls
     print('Found {} new items since last scan'.format(len(new_links)))
-    with open(result_url_file, 'a') as f:
+    with open(result_url_file, 'a+') as f:
         for item in new_links:
             f.write("%s\n" % item)
 
@@ -100,11 +100,11 @@ def scrape(progress):
             all_text = all_text.replace('SPIEGEL+', '')
             all_text = all_text.replace('SPIEGEL', '')
             if all_text:
+                all_text = all_text.encode('utf-16', 'surrogatepass').decode('utf-16') # to prevent surrogates not allowed error
                 fields = [url.rstrip('/'),
                           all_text]
                 result_article_file = RESULTPATH + '\\spon.csv'
                 Path(result_article_file).touch(exist_ok=True)
-                all_text = all_text.encode('utf-16', 'surrogatepass').decode('utf-16') # to prevent surrogates not allowed error
                 with open(result_article_file, 'a+', encoding='utf-8', newline='') as f:
                     writer = csv.writer(f, delimiter='|')
                     writer.writerow(fields)
