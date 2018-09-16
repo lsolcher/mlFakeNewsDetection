@@ -1,12 +1,13 @@
-from . import SponScraper, SzScraper, JungeFreiheitScraper
+from . import SponScraper, SzScraper, JungeFreiheitScraper, utils
 import traceback, os
 from .. import constants
 from pathlib import Path
 
 def scrape():
     try:
-        progress = []
         prepare_progress_file()
+        progress = ['Starter Artikelanalyse']
+        utils.update_progress(progress)
         print('-------')
         print('Scraping SZ')
         print('-------')

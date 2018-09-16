@@ -31,8 +31,7 @@ def scrape(progress):
     for page in PAGE:
         soup_mainpages.append(BeautifulSoup(page, 'html.parser'))
 
-    progress.append('Analysiere aktuelle Artikel von www.spiegel.de')
-    progress.append('Sammle Artikel...')
+    progress[-1] =('Sammle aktuelle Artikel von www.spiegel.de')
     # progress.progress_value = 0
     update_progress(progress)
 
@@ -56,7 +55,10 @@ def scrape(progress):
                             if prog_str not in progress:
                                 # because some article urls are found more than once and
                                 # won't be added twice but counting still thinks somethin new is added
-                                progress.append(prog_str)
+                                if len(article_links) == 100:
+                                    progress[-1] =(prog_str)
+                                else:
+                                    progress[-1] = prog_str
                                 update_progress(progress)
 
             except TypeError:
@@ -65,9 +67,9 @@ def scrape(progress):
             except Exception:
                 traceback.print_exc()
 
-    progress.append('Neue Artikel gesammelt!')
-    progress.append('Insgesamt wurden {} Artikel gefunden.'.format(len(article_links)))
-    progress.append('Gleiche mit Datenbank ab...')
+    progress[-1] =('Neue Artikel gesammelt!')
+    progress[-1] =('Insgesamt wurden {} Artikel gefunden.'.format(len(article_links)))
+    progress[-1] =('Gleiche mit Datenbank ab...')
     # progress.progress_value = 11
     update_progress(progress)
 
@@ -81,7 +83,7 @@ def scrape(progress):
         for item in new_links:
             f.write("%s\n" % item)
 
-    progress.append('{} neue Artikel seit dem letzten Scan gefunden. \n Schreibe Artikel in Datenbank...'.format(len(new_links)))
+    progress[-1] =('{} neue Artikel seit dem letzten Scan gefunden. \n Schreibe Artikel in Datenbank...'.format(len(new_links)))
     update_progress(progress)
     print('Found {} unique articles in total. Start writing...'.format(len(new_links)))
 
@@ -110,19 +112,22 @@ def scrape(progress):
                     writer.writerow(fields)
             if idx % 100 == 0:
                 print('Scraped {} of {} articles'.format(idx, len(new_links)))
-                progress.append('Schreibe Artikel...')
-                progress.append('Bisher wurden {} von {} Artikel geschrieben.'.format\
-                    (idx, len(new_links)))
+                if idx == 100:
+                    progress[-1] =('Bisher wurden {} von {} Artikel geschrieben.'.format\
+                        (idx, len(new_links)))
+                else:
+                    progress[-1] = ('Bisher wurden {} von {} Artikel geschrieben.'.format\
+                        (idx, len(new_links)))
                 update_progress(progress)
         except Exception:
             traceback.print_exc()
 
 
-    progress.append('Datenbank mit neuesten Artikeln von www.spiegel.de erfolgreich aktualisiert!')
-    progress.append('Insgesamt wurden {} neue Artikel in die Datenbank geschrieben.'.format(len(new_links)))
+    progress[-1] = 'Datenbank mit neuesten Artikeln von www.spiegel.de erfolgreich aktualisiert!'
+    progress.insert(0, 'Insgesamt wurden {} neue Artikel von www.spiegel.de in die Datenbank geschrieben.'.format(len(new_links)))
     # progress.progress_value = 33
     update_progress(progress)
     return progress
-    
+
     
 

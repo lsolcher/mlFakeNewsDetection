@@ -1,33 +1,36 @@
 <template>
   <div>
-    <p>Home page</p>
-    <v-container grid-list-md text-xs-center align-center>
-      <v-layout row wrap>
-        <br>
-        <v-flex xs12 sm6 md3>
-          <v-text-field
-            class="text-xs-center"
-            label="Artikel-link, Tweet-link oder Tweet-id einfügen..."
-            placeholder="https://twitter.com/i/web/status/1038073678058139648"
-            id="userinput"
-            v-model="input"
-            @input="updateInput()"
-          ></v-text-field>
-        </v-flex>
-        <br>
-      </v-layout>
-    </v-container>
-    <dnn />
-    <create_bow />
-    <get_bow />
-    <scrape />
-    <complete_analysis />
-    <template>
-      <vue-flip :active-hover="true" width="200px" height="50px" class="simple-test">
-        <div slot="front">test </div>
-        <slot name="back">test </slot>
-      </vue-flip>
-    </template>
+    <v-app>
+      <p>Home page</p>
+      <v-container grid-list-md text-xs-center align-center>
+        <v-layout row wrap>
+          <br>
+          <v-flex xs12 sm6 md3>
+            <v-text-field
+              class="text-xs-center"
+              label="Artikel-link, Tweet-link oder Tweet-id einfügen..."
+              placeholder="https://twitter.com/i/web/status/1038073678058139648"
+              id="userinput"
+              v-model="input"
+              @input="updateInput()"
+            ></v-text-field>
+          </v-flex>
+          <br>
+          <dnn />
+          <create_bow />
+          <get_bow />
+          <scrape />
+          <complete_analysis />
+          <template>
+            <vue-flip :active-hover="true" width="200px" height="50px" class="simple-test">
+              <div slot="front">test </div>
+              <slot name="back">test </slot>
+            </vue-flip>
+          </template>
+        </v-layout>
+      </v-container>
+
+    </v-app>
   </div>
 </template>
 

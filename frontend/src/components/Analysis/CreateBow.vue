@@ -2,8 +2,11 @@
   <div>
     <!-- CREATE BOW MODEL -->
     <template v-if="!createBowDone">
-      <p>Analysiere Link...</p>
-      <p>{{bowProgress}}</p>
+      <ul v-for="msg in bowProgress">
+        <p>
+          {{ msg }}
+        </p>
+      </ul>
       <v-progress-circular
         indeterminate
         color="primary"

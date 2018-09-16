@@ -58,6 +58,7 @@
             this.output = response.data;
             console.log(this.output);
             console.log(typeof this.output);
+            console.log(this.output.url);
             this.done = true;
           })
           .catch(error => {

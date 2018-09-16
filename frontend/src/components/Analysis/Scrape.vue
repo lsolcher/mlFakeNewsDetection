@@ -1,29 +1,31 @@
 <template>
     <div>
-      <!-- SCRAPING -->
+      <v-app>
+        <!-- SCRAPING -->
 
-      <!-- currently scraping -->
-      <template v-if="!scrapingDone">
-        <p>Aktualisiere Datenbank...</p>
-        <v-progress-circular
-          indeterminate
-          color="primary"
-        ></v-progress-circular>
-        <ul v-for="msg in scrapeProgress">
-          <p>
-            {{ msg }}
-          </p>
-        </ul>
-      </template>
+        <!-- currently scraping -->
+        <template v-if="!scrapingDone">
+          <p>Aktualisiere Datenbank...</p>
+          <v-progress-circular
+            indeterminate
+            color="btnColor"
+          ></v-progress-circular>
+          <ul v-for="msg in scrapeProgress">
+            <p>
+              {{ msg }}
+            </p>
+          </ul>
+        </template>
 
 
 
-      <template v-else>
-        <v-btn
-          @click="scrape()"
-        >Artikeldatenbank aktualisieren</v-btn>
-      </template>
-
+        <template v-else>
+          <v-btn
+            :disabled="!btnEnabled"
+            @click="scrape()"
+          >{{ btnText }}</v-btn>
+        </template>
+      </v-app>
     </div>
 </template>
 
@@ -36,7 +38,10 @@
       return {
         scrapingOutput: '',
         scrapingDone: true,
-        scrapeProgress: ''
+        scrapeProgress: '',
+        btnText: 'Artikeldatenbank aktualisieren',
+        btnEnabled: true,
+        btnColor:'info'
       }
     },
     methods: {
@@ -53,13 +58,17 @@
             this.scrapingOutput = response.data.result;
             console.log(this.scrapingOutput);
             this.scrapingDone = true;
+            this.btnText = 'Datenbank erfolgreich aktualisiert!';
+            this.btnEnabled = false;
+            this.btnColor = 'success'
             clearInterval(this.scrapeProgressId)
           })
           .catch(error => {
             console.log(error);
             this.scrapingOutput = "Ein unerwarteter Fehler ist aufgetreten";
             this.scrapingDone = true
-          })
+          });
+        this.scrapingOutput = ''
       },
 
       //TODO:
@@ -73,7 +82,6 @@
         axios.get(path)
           .then(response => {
             this.scrapeProgress = Array.from(response.data);
-            console.log(typeof this.scrapeProgress)
           })
           .catch(error => {
             console.log(error);

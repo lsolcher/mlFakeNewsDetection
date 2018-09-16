@@ -43,11 +43,10 @@ def activate_job():
         while True:
             now = datetime.datetime.now()
             print(now.minute)
-            if now.minute == 38:
-                scrape()
-                createBow()
+            if now.minute == 00:
+                scrape_backend()
+                createBow_backend()
                 print('updated models')
-            print("Run recurring task")
             time.sleep(60)
 
     thread = threading.Thread(target=run_job)
@@ -156,3 +155,11 @@ def catch_all(path):
     if app.debug:
         return requests.get('http://localhost:8080/{}'.format(path)).text
     return render_template("index.html")
+
+
+def scrape_backend():
+    scraper.scrape()
+
+
+def createBow_backend():
+    bow.create_bow_model()
