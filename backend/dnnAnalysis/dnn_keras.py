@@ -27,7 +27,7 @@ MODEL_FOLDER = constants.MODEL_FOLDER
 OUTPUT_LABELS = 2
 CLASS_WEIGHT = {0: 30.,
                 1: 1.}
-X_SHAPE = 608
+X_SHAPE = 408
 
 def build_model(architecture='mlp'):
     model = Sequential()
@@ -65,7 +65,7 @@ def build_model(architecture='mlp'):
         model = Model(inputs=inputs, outputs=outputs, name='CNN')
     elif architecture == 'lstm':
         # LSTM network
-        inputs = Input(shape=(300,1))
+        inputs = Input(shape=(X_SHAPE,1))
 
         x = Bidirectional(LSTM(64, return_sequences=True),
                           merge_mode='concat')(inputs)
@@ -111,7 +111,7 @@ def run(articles, articles_test, twitter_data, text_analysis=True, all_features=
                 X_train_tweet, X_test_tweet, y_train_tweet, y_test_tweet, w2v_tweet, train_cleaned_vec_tweet, y_train_ohe_tweet = create_word_vecs_from_twitter(
                     TWITTER_DATA_FILE, type_of_analysis='tweet_text')
                 X_meta = create_meta_data_from_twitter(TWITTER_DATA_FILE)
-                train_cleaned_vec = np.concatenate([trcain_cleaned_vec_article, train_cleaned_vec_tweet, X_meta], axis=1)#
+                train_cleaned_vec = np.concatenate([train_cleaned_vec_article, train_cleaned_vec_tweet, X_meta], axis=1)#
                 y_train_ohe = y_train_ohe_article
 
                 scaler = StandardScaler()
@@ -143,12 +143,12 @@ def run(articles, articles_test, twitter_data, text_analysis=True, all_features=
 
 def predict(model, predict_file, w2v_article, w2v_tweet=None):
     print('predicting')
-    if w2v_tweet:
+    if w2v_tweet: # predict a tweet with scaler for article_text, tweet_text, metadata
         X_test = pack_data_to_predict(predict_file, w2v_article, w2v_tweet)
         print(X_test)
         X_meta = create_meta_data_from_twitter(predict_file)
         x_predict = np.concatenate([X_test, X_meta], axis=1)
-        scaler = utils.load_obj(constants.OBJECT_FOLDER, 'scaler_tweet')
+        scaler = utils.load_obj(constants.OBJECT_FOLDER, 'scaler')
     else:  # predicting an article
         x_predict = pack_data_to_predict(predict_file, w2v_article)
         scaler = utils.load_obj(constants.OBJECT_FOLDER, 'scaler_article')

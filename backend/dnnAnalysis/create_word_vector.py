@@ -95,7 +95,7 @@ def get_preprocessed_text(text):
 
 # Define function to create word vectors given a cleaned piece of text.
 def create_average_vec(doc, wordvec_model):
-    text_dim = 300
+    text_dim = 200
     average = np.zeros((text_dim,), dtype='float32')
     num_words = 0.
     for word in doc.split():
@@ -277,7 +277,7 @@ def do_create(train, test):
     train_cleaned_word2vec = cleanup_text_word2vec(all_text['data'], nlp, logging=True)
     print('Cleaned up training data size (i.e. number of sentences): ', len(train_cleaned_word2vec))
 
-    text_dim = 300
+    text_dim = 200
     print("Training Word2Vec model...")
     wordvec_model = Word2Vec(train_cleaned_word2vec, size=text_dim, window=5, min_count=3, workers=4, sg=1)
     print("Word2Vec model created.")
@@ -295,7 +295,7 @@ def do_create(train, test):
     print(wordvec_model.wv.similarity('afd', 'links'))
 
     # Create word vectors
-    train_cleaned_vec = np.zeros((train.shape[0], text_dim), dtype="float32")  # 19579 x 300
+    train_cleaned_vec = np.zeros((train.shape[0], text_dim), dtype="float32")  # 19579 x 200
     for i in range(len(train_cleaned)):
         train_cleaned_vec[i] = create_average_vec(train_cleaned[i], wordvec_model)
 
@@ -345,7 +345,7 @@ def do_create_twitter(train, test):
     train_cleaned_word2vec = cleanup_text_word2vec(all_text['data'], nlp, logging=True)
     print('Cleaned up training data size (i.e. number of sentences): ', len(train_cleaned_word2vec))
 
-    text_dim = 300
+    text_dim = 200
     print("Training Word2Vec model...")
     wordvec_model = Word2Vec(train_cleaned_word2vec, size=text_dim, window=5, min_count=3, workers=4, sg=1)
     print("Word2Vec model created.")
@@ -366,7 +366,7 @@ def do_create_twitter(train, test):
         pass
 
     # Create word vectors
-    train_cleaned_vec = np.zeros((train.shape[0], text_dim), dtype="float32")  # 19579 x 300
+    train_cleaned_vec = np.zeros((train.shape[0], text_dim), dtype="float32")  # 19579 x 200
     for i in range(len(train_cleaned)):
         train_cleaned_vec[i] = create_average_vec(train_cleaned[i], wordvec_model)
 
@@ -408,7 +408,7 @@ def pack_data_to_predict(predict_file, wordvec_model_article, wordvec_model_twee
     predict_cleaned_article = get_spacy_corpus(df['article_text'], nlp, logging=True)
     print('Cleaned up training data shape: ', predict_cleaned_article.shape)
 
-    text_dim = 300
+    text_dim = 200
 
     # Create word vectors
     predict_cleaned_vec = np.zeros((df.shape[0], text_dim), dtype="float32")
