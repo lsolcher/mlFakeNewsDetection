@@ -3,7 +3,6 @@ import pickle
 import tensorflow as tf
 import pandas as pd
 import collections
-from flask import jsonify
 
 def save_obj(obj, path, name):
     with open(path + name + '.pkl', 'wb') as f:
