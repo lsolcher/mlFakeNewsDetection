@@ -1,24 +1,20 @@
 <template>
-  <div>
-    <!-- CREATE BOW MODEL -->
-    <template v-if="!createBowDone">
-      <ul v-for="msg in bowProgress">
-        <p>
-          {{ msg }}
-        </p>
-      </ul>
-      <v-progress-circular
-        indeterminate
-        color="primary"
-      ></v-progress-circular>
-    </template>
-    <template v-else>
-      <v-btn
-        @click="createBowModel()"
-      >BOW-Modell aktualisieren</v-btn>
-      <p>{{createBowOutput}}</p>
-    </template>
-  </div>
+    <div>
+      <!-- CREATE BOW MODEL -->
+      <template v-if="!createBowDone">
+        <p>{{bowProgress[bowProgress.length - 1]}}</p>
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </template>
+      <template v-else>
+        <v-btn block color="info"
+          @click="createBowModel()"
+        >BOW-Modell aktualisieren</v-btn>
+        <p>{{createBowOutput}}</p>
+      </template>
+    </div>
 </template>
 
 <script>

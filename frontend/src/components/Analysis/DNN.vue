@@ -1,20 +1,26 @@
 <template>
   <!-- DNN ANALYSIS -->
-  <div>
-  <template v-if="!dnnAnalysisDone">
-    <p>Analysiere Link...</p>
-    <v-progress-circular
-      indeterminate
-      color="primary"
-    ></v-progress-circular>
-  </template>
-  <template v-else>
-    <v-btn
-      @click="getDNNAnalysisResult()"
-    >Artikel nach Textstil analysieren</v-btn> <!-- :disabled="input === ''" !-->
-    <p>{{dnnAnalysisOutput}}</p>
-  </template>
-  </div>
+    <div>
+    <template v-if="!dnnAnalysisDone">
+      <p>Analysiere Link...</p>
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      ></v-progress-circular>
+    </template>
+    <template v-else>
+      <v-btn block color="info"
+             :disabled="input === ''"
+             :loading="!dnnAnalysisDone"
+        @click="getDNNAnalysisResult()"
+      >Tweet oder Artikel nach Textstil analysieren</v-btn>
+      <template v-if="dnnAnalysisOutput">
+        <p v-if="dnnAnalysisOutput === -1" >{{"Die Eingabe verlinkt auf keinen Tweet oder Link"}}</p>
+        <p v-else-if="dnnAnalysisOutput < 0.5" style="color:green;"> <img src="../../assets/trump_sad.jpg" width="100%"> Nach Textstilanalyse beinhaltet der Artikel wahrscheinlich keine Fake News! Die errechnete Wahrscheinlichkeit beträgt {{1 - dnnAnalysisOutput}}%.</p>
+        <p v-else style="color:red;"><img src="../../assets/trump_happy.jpg" width="100%"> Nach Textstilanalyse beinhaltet der Artikel wahrscheinlich Fake News! Die errechnete Wahrscheinlichkeit beträgt {{1 - dnnAnalysisOutput}}%.</p>
+      </template>
+    </template>
+    </div>
 </template>
 
 <script>
@@ -45,7 +51,7 @@
           }
         })
           .then(response => {
-            this.dnnAnalysisOutput = response.data;
+            this.dnnAnalysisOutput = response.data.result;
             console.log(this.dnnAnalysisOutput);
             this.dnnAnalysisDone = true
           })

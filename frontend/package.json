@@ -15,10 +15,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "style-loader": "^0.23.0",
     "vue": "^2.5.2",
+    "vue-flip": "latest",
     "vue-router": "^3.0.1",
-    "vuetify": "latest",
-    "vue-flip": "latest"
+    "vuetify": "^1.2.3"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

@@ -1,29 +1,27 @@
 <template>
-  <div>
-    <!-- GET BOW ANALYSIS -->
+    <div>
+      <!-- GET BOW ANALYSIS -->
 
-    <!-- currently analysing -->
-    <template v-if="!done">
-      <p>Analysiere Link...</p>
-      <v-progress-circular
-        indeterminate
-        color="primary"
-      ></v-progress-circular>
-      <ul>
-        <p v-for="(item, index) in output.url"> <span v-html="output.url[index]"></span> : {{output.value[index]}}</p>
-      </ul>
-    </template>
-
-
-
-    <template v-else>
-      <v-btn
-        @click="getAnalysisResult()"
-        :disabled="input === ''"
-      >Link auf Wortähnlichkeit untersuchen</v-btn>
-
-    </template>
-  </div>
+      <!-- currently analysing -->
+      <template v-if="!done">
+        <p>Analysiere Link...</p>
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </template>
+      <template v-else>
+        <v-btn block color="info"
+          @click="getAnalysisResult()"
+          :disabled="input === ''"
+        >Tweet oder Artikel auf Wortähnlichkeit untersuchen</v-btn>
+        <template v-if="output.value">
+          <p v-if="output.value === -1" >{{"Die Eingabe verlinkt auf keinen Tweet oder Link"}}</p>
+          <p v-else-if="output.value > 0.33"style="color:green;"> <img src="../../assets/trump_sad.jpg" width="80%">  <br /> Nach Wortähnlichkeitsanalyse wurden Artikel in der Datenbank gefunden! <span v-html="link"></span> um den Artikel aufzurufen. (Cosinus-Ähnlichkeit: {{output.value}}) Dieser Artikel ist wahrscheinlich so oder in ähnlicher Form schon erschienen. </p>
+          <p v-else style="color:red;" > <img src="../../assets/trump_happy.jpg" width="100%">  Nach Wortähnlichkeitsanalyse wurden keine ähnlichen Artikel in der Datenbank gefunden! <span v-html="link"></span> um den "ähnlichsten" Artikel in der Datenbank aufzurufen. (Cosinus-Ähnlichkeit: {{output.value}}). Dieser Artikel ist so oder in ähnlicher Form nicht in der Datenbank vorhanden.</p>
+        </template>
+      </template>
+    </div>
 </template>
 
 <script>
@@ -37,7 +35,8 @@
       return {
         output: '',
         done: true,
-        input: ''
+        input: '',
+        link: ''
       }
     },
     methods: {
@@ -56,9 +55,7 @@
         })
           .then(response => {
             this.output = response.data;
-            console.log(this.output);
-            console.log(typeof this.output);
-            console.log(this.output.url);
+            this.link = String(this.output.url).replace(/\"/g, '');
             this.done = true;
           })
           .catch(error => {

@@ -1,6 +1,5 @@
 <template>
     <div>
-      <v-app>
         <!-- SCRAPING -->
 
         <!-- currently scraping -->
@@ -20,12 +19,11 @@
 
 
         <template v-else>
-          <v-btn
+          <v-btn block color="info"
             :disabled="!btnEnabled"
             @click="scrape()"
           >{{ btnText }}</v-btn>
         </template>
-      </v-app>
     </div>
 </template>
 

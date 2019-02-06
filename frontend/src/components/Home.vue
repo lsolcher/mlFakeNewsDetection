@@ -1,11 +1,15 @@
 <template>
   <div>
     <v-app>
-      <p>Home page</p>
-      <v-container grid-list-md text-xs-center align-center>
-        <v-layout row wrap>
-          <br>
-          <v-flex xs12 sm6 md3>
+      <h2>Fake News Detection</h2>
+      <v-container grid-list-md text-xs-center align-center >
+          <v-flex xs12 sm12 md12 mt-5 mb-5>
+            <vue-flip :active-hover="true" width=100% height="100px" class="simple-test">
+              <div slot="front">how to </div>
+              <div slot="back">URL eingeben, die auf einen Link oder einen Tweet verweist. Der Link kann nach Wortähnlichkeit (BoW-Modell), nach Textstilanalyse mit Deep Neural Networks oder nach beiden Methoden untersucht werden. Ist die Eingabe ein Tweet, wird in die Analyse zusätzlich der Tweet-Text und die Daten des Tweeters miteinbezogen. Um die Güte der Wortähnlichkeit zu erhöhen, wird empfohlen, vor Analyse die Datenbank und das Bow-Modell zu aktualisieren.</div>
+            </vue-flip>
+          </v-flex>
+           <v-flex xs12 sm12 md12 offset -sm3 mb-3>
             <v-text-field
               class="text-xs-center"
               label="Artikel-link, Tweet-link oder Tweet-id einfügen..."
@@ -15,21 +19,33 @@
               @input="updateInput()"
             ></v-text-field>
           </v-flex>
-          <br>
-          <dnn />
-          <create_bow />
-          <get_bow />
-          <scrape />
+        <v-layout row wrap>
+          <v-flex xs6 sm6 md6>
+            <scrape />
+          </v-flex>
+          <v-flex xs6 sm6 md6>
+            <create_bow />
+          </v-flex>
+          <v-flex xs6 sm6 md6>
+            <get_bow />
+          </v-flex>
+          <v-flex xs6 sm6 md6>
+            <dnn />
+          </v-flex>
+          <v-flex xs12 sm12 md12>
           <complete_analysis />
-          <template>
-            <vue-flip :active-hover="true" width="200px" height="50px" class="simple-test">
-              <div slot="front">test </div>
-              <slot name="back">test </slot>
-            </vue-flip>
-          </template>
-        </v-layout>
-      </v-container>
+          </v-flex>
+          <v-flex xs12 sm12 md12>
 
+          </v-flex>
+        </v-layout>
+        <v-flex  xs12 sm12 md12 mt-5>
+          <vue-flip :active-hover="true" width=100% height="50px" class="simple-test">
+            <div slot="front">about </div>
+            <div slot="back">&#9400; Lucas Solcher <br> <a href="mailto:l.solcher@gmail.com">Mail</a> </div>
+          </vue-flip>
+        </v-flex>
+      </v-container>
     </v-app>
   </div>
 </template>
@@ -66,13 +82,16 @@
   }
 </script>
 
-<style scoped>
+<style>
 
+  .flipper .front {
+    background: hotpink;
+  }
   .simple-test div .front {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #673AB7;
+    background-color: #6B5B95;
     color: white;
   }
 
@@ -80,7 +99,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #FFC107;
+    background-color: #6B5B95;
     color: white
   }
 </style>
